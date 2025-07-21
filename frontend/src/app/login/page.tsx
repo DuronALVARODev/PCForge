@@ -31,10 +31,11 @@ const LoginPage = () => {
   useEffect(() => {
     document.title = 'Iniciar Sesión';
     if (user) {
-      // Redirigir según el rol si ya está autenticado
-      if (user.role === 'admin' || user.role === 'superadmin') {
+      // Evita redirección infinita si ya está en la ruta destino
+      const currentPath = window.location.pathname;
+      if ((user.role === 'admin' || user.role === 'superadmin') && currentPath !== '/admin') {
         router.push('/admin');
-      } else {
+      } else if (user.role !== 'admin' && user.role !== 'superadmin' && currentPath !== '/pc-build') {
         router.push('/pc-build');
       }
     }

@@ -100,10 +100,10 @@ const login = async (req, res) => {
         res.cookie('refreshToken', tokens.refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
         // Guardar accessToken en cookie
         res.cookie('accessToken', tokens.accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
-        // Obtener información del usuario para el log
-        const user = await prisma.user.findUnique({ where: { email }, select: { id: true, username: true } });
+        // Obtener información del usuario para el log y respuesta
+        const user = await prisma.user.findUnique({ where: { email }, select: { id: true, username: true, email: true, createdAt: true, role: true, isVerified: true } });
         logSecurityEvent('LOGIN_SUCCESS', user?.id, clientIP, { userAgent, email });
-        res.json({ message: "Inicio de sesión exitoso", code: 'LOGIN_SUCCESS' });
+        res.json({ message: "Inicio de sesión exitoso", code: 'LOGIN_SUCCESS', user });
     } catch (error) {
         logSecurityEvent('LOGIN_FAILED', null, clientIP, { userAgent, email: req.body.email, error: error.message });
         console.error("Error en login:", error);

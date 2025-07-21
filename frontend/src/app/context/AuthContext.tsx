@@ -61,16 +61,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const login = async (credentials: LoginCredentials) => {
     try {
-      await axios.post(`${API_BASE_URL}/login`, credentials, {
+      const loginRes = await axios.post(`${API_BASE_URL}/login`, credentials, {
         withCredentials: true,
       });
-      const userRes = await axios.get(`${API_BASE_URL}/me`, { withCredentials: true });
-      setUser(userRes.data);
-      const role = userRes.data.role;
-      if (role === "admin" || role === "superadmin") {
-        router.push("/admin");
+      // El backend ya establece las cookies, solo actualiza el usuario con la respuesta si la incluye
+      if (loginRes.data && loginRes.data.user) {
+        setUser(loginRes.data.user);
       } else {
-        router.push("/pc-build");
+        // Si no, realiza solo una petición a /me
+        const userRes = await axios.get(`${API_BASE_URL}/me`, { withCredentials: true });
+        setUser(userRes.data);
       }
     } catch {
       throw new Error('Login failed');
