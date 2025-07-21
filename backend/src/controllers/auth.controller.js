@@ -88,26 +88,11 @@ const login = async (req, res) => {
             return res.status(400).json({ message: "Formato de email inválido", code: 'LOGIN_INVALID_EMAIL' });
         }
         const tokens = await loginUser(email, password);
-        // Configurar cookies seguras para cross-origin
-        let cookieDomain = undefined;
-        if (process.env.NODE_ENV === 'production') {
-            cookieDomain = process.env.COOKIE_DOMAIN || 'pc-forge-smoky.vercel.app'; // fallback seguro
-        }
-        const cookieOptions = {
-            httpOnly: true,
-            secure: true, // Siempre true para cross-origin
-            sameSite: 'None', // Necesario para cross-origin
-            path: '/',
-            domain: cookieDomain
-        };
-        // Guardar refreshToken en cookie
-        res.cookie('refreshToken', tokens.refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
-        // Guardar accessToken en cookie
-        res.cookie('accessToken', tokens.accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
         // Obtener información del usuario para el log y respuesta
         const user = await prisma.user.findUnique({ where: { email }, select: { id: true, username: true, email: true, createdAt: true, role: true, isVerified: true } });
-        logSecurityEvent('LOGIN_SUCCESS', user?.id, clientIP, { userAgent, email, cookieDomain, cookieOptions });
-        res.json({ message: "Inicio de sesión exitoso", code: 'LOGIN_SUCCESS', user });
+        logSecurityEvent('LOGIN_SUCCESS', user?.id, clientIP, { userAgent, email });
+        // Devolver tokens en el body (NO en cookies)
+        res.json({ message: "Inicio de sesión exitoso", code: 'LOGIN_SUCCESS', user, accessToken: tokens.accessToken, refreshToken: tokens.refreshToken });
     } catch (error) {
         logSecurityEvent('LOGIN_FAILED', null, clientIP, { userAgent, email: req.body.email, error: error.message });
         console.error("Error en login:", error);

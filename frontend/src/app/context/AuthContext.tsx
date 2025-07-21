@@ -41,14 +41,22 @@ const API_BASE_URL = 'https://pcforge-backend.onrender.com/api/auth';
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
 
   // Validación inicial al montar la app
   useEffect(() => {
     const validateSession = async () => {
+      if (!accessToken) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
       try {
-        const res = await axios.get(`${API_BASE_URL}/me`, { withCredentials: true });
+        const res = await axios.get(`${API_BASE_URL}/me`, {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
         setUser(res.data);
       } catch {
         setUser(null);
@@ -57,40 +65,41 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
     };
     validateSession();
-  }, []);
+  }, [accessToken]);
 
   const login = async (credentials: LoginCredentials) => {
     try {
-      const loginRes = await axios.post(`${API_BASE_URL}/login`, credentials, {
-        withCredentials: true,
-      });
-      // El backend ya establece las cookies, solo actualiza el usuario con la respuesta si la incluye
-      if (loginRes.data && loginRes.data.user) {
+      const loginRes = await axios.post(`${API_BASE_URL}/login`, credentials);
+      if (loginRes.data && loginRes.data.accessToken && loginRes.data.user) {
+        setAccessToken(loginRes.data.accessToken);
         setUser(loginRes.data.user);
       } else {
-        // Si no, realiza solo una petición a /me
-        const userRes = await axios.get(`${API_BASE_URL}/me`, { withCredentials: true });
-        setUser(userRes.data);
+        setUser(null);
+        setAccessToken(null);
+        throw new Error('Login failed');
       }
     } catch {
+      setUser(null);
+      setAccessToken(null);
       throw new Error('Login failed');
     }
   };
 
   const logout = async () => {
-    try {
-      await axios.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true });
-      setUser(null);
-      router.push('/login');
-    } catch {
-      setUser(null);
-      router.push('/login');
-    }
+    setUser(null);
+    setAccessToken(null);
+    router.push('/login');
   };
 
   const refreshUser = async () => {
+    if (!accessToken) {
+      setUser(null);
+      return;
+    }
     try {
-      const res = await axios.get(`${API_BASE_URL}/me`, { withCredentials: true });
+      const res = await axios.get(`${API_BASE_URL}/me`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
       setUser(res.data);
     } catch {
       setUser(null);
