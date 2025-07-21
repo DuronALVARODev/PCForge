@@ -11,7 +11,11 @@ const AdminPage = () => {
   useEffect(() => {
     const checkAdminAccess = async () => {
       try {
-        const res = await fetch("/api/auth/me", { credentials: "include" });
+        // Obtener accessToken del contexto
+        const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+        const res = await fetch("https://pcforge-backend.onrender.com/api/auth/me", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
         if (!res.ok) {
           router.replace("/login");
           return;
