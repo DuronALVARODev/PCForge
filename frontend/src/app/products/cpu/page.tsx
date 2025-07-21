@@ -40,7 +40,7 @@ const fetchCpusFromApi = async (): Promise<CPU[]> => {
   const res = await fetch("/api/cpus");
   if (!res.ok) throw new Error("Error al obtener CPUs");
   const data = await res.json();
-  return data.map((cpu: any) => ({
+return data.map((cpu: Record<string, unknown>) => ({
     id: cpu.id,
     name: cpu.name,
     manufacturer: cpu.manufacturer || "",
@@ -56,7 +56,11 @@ const fetchCpusFromApi = async (): Promise<CPU[]> => {
     cache_l2: cpu.cache_l2 || undefined,
     cache_l3: cpu.cache_l3 || undefined,
     tdp: cpu.tdp || undefined,
-    best_price: cpu.best_price !== undefined && cpu.best_price !== null ? cpu.best_price : ((cpu.raw_data && cpu.raw_data.price) || cpu.tdp || 0),
+    best_price: cpu.best_price !== undefined && cpu.best_price !== null
+      ? cpu.best_price
+      : (typeof cpu.raw_data === 'object' && cpu.raw_data !== null && 'price' in cpu.raw_data
+        ? (cpu.raw_data as { price?: number }).price ?? cpu.tdp ?? 0
+        : cpu.tdp ?? 0),
     best_price_store: cpu.best_price_store || "",
     best_price_url: cpu.best_price_url || "",
     image: `/api/images/CPU_IMG/${typeof cpu.name === 'string' ? encodeURIComponent(cpu.name) : ''}.jpg`,
@@ -102,7 +106,7 @@ const CpuPage: React.FC = () => {
   const filterOptions = useMemo(() => {
     const options: Record<string, unknown[]> = {};
     cpuFilters.forEach((f) => {
-      options[f.key] = Array.from(new Set(cpus.map((cpu) => (cpu as any)[f.key]).filter((v) => v !== undefined && v !== null)));
+      options[f.key] = Array.from(new Set(cpus.map((cpu) => (cpu as CPU)[f.key as keyof CPU]).filter((v) => v !== undefined && v !== null)));
     });
     return options;
   }, [cpus]);
@@ -120,7 +124,7 @@ const CpuPage: React.FC = () => {
       // Filtros select
       for (const key in filters) {
         if (!filters[key]) continue;
-        const value = (cpu as any)[key];
+        const value = cpu[key as keyof CPU];
         if (typeof value === "number") {
           if (value !== Number(filters[key])) return false;
         } else {

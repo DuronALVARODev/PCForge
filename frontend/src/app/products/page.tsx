@@ -75,11 +75,6 @@ type RAM = { id: number; name: string; brand: string; price: number; image: stri
 type Storage = { id: number; name: string; brand: string; price: number; image: string; rating: number; capacity: string; type: string };
 
 type ComponentType = CPU | GPU | RAM | Storage;
-
-
-
-
-// Mantener los mocks de las otras categorías
 const mockComponents = {
   tarjetas_graficas: [
     { id: 1, name: "RTX 4090", brand: "NVIDIA", price: 35000, image: "/api/placeholder/300/200", rating: 4.9, memory: "24GB GDDR6X", performance: "4K Gaming" },
@@ -155,11 +150,9 @@ const ComponentCarousel: React.FC<ComponentCarouselProps> = ({ category, compone
   const togglePlayPause = () => {
     setIsPlaying(!isPlaying);
   };
-
   const handleMouseEnter = () => {
     setIsPaused(true);
   };
-
   const handleMouseLeave = () => {
     setIsPaused(false);
   };

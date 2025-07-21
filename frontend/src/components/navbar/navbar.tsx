@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { Menu, X, ChevronDown, User, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../../app/context/AuthContext';
 import './navbar.css';

@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import "./pc-build.css"
 
+import Image from 'next/image';
 // Icons (Simple SVG components)
 const CpuIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -268,25 +269,31 @@ const PCConfigurator = () => {
         const res = await fetch("/api/cpus");
         if (!res.ok) throw new Error("Error al obtener CPUs");
         const data = await res.json();
-        const cpus: Component[] = data.map((cpu: any) => ({
-          id: cpu.id,
-          name: cpu.name,
-          brand: cpu.manufacturer || "",
-          price: cpu.best_price !== undefined && cpu.best_price !== null ? cpu.best_price : (cpu.raw_data?.price || cpu.tdp || 0),
-          best_price: cpu.best_price !== undefined && cpu.best_price !== null ? cpu.best_price : undefined,
-          image: `/api/images/CPU_IMG/${encodeURIComponent(cpu.name)}.jpg`,
-          specs: {
-            Núcleos: cpu.cores_total?.toString() || "-",
-            Hilos: cpu.cores_threads?.toString() || "-",
-            "Frecuencia Base": cpu.clock_base ? `${cpu.clock_base} GHz` : "-",
-            Socket: cpu.socket || "-",
-            TDP: cpu.tdp ? `${cpu.tdp}W` : "-",
-          },
-          compatibility: {
-            socket: cpu.socket,
-            powerRequirement: cpu.tdp || undefined,
-          },
-        }));
+        const cpus: Component[] = data.map((cpu: Record<string, unknown>) => {
+          const name = typeof cpu.name === 'string' ? cpu.name : '';
+          const rawData = typeof cpu.raw_data === 'object' && cpu.raw_data !== null ? cpu.raw_data as { price?: number } : undefined;
+          return {
+            id: typeof cpu.id === 'string' ? cpu.id : '',
+            name,
+            brand: typeof cpu.manufacturer === 'string' ? cpu.manufacturer : '',
+            price: cpu.best_price !== undefined && cpu.best_price !== null
+              ? Number(cpu.best_price)
+              : (rawData?.price ?? (typeof cpu.tdp === 'number' ? cpu.tdp : 0)),
+            best_price: cpu.best_price !== undefined && cpu.best_price !== null ? Number(cpu.best_price) : undefined,
+            image: `/api/images/CPU_IMG/${encodeURIComponent(name) }.jpg`,
+            specs: {
+              Núcleos: typeof cpu.cores_total === 'number' ? cpu.cores_total.toString() : '-',
+              Hilos: typeof cpu.cores_threads === 'number' ? cpu.cores_threads.toString() : '-',
+              "Frecuencia Base": typeof cpu.clock_base === 'number' ? `${cpu.clock_base} GHz` : '-',
+              Socket: typeof cpu.socket === 'string' ? cpu.socket : '-',
+              TDP: typeof cpu.tdp === 'number' ? `${cpu.tdp}W` : '-',
+            },
+            compatibility: {
+              socket: typeof cpu.socket === 'string' ? cpu.socket : undefined,
+              powerRequirement: typeof cpu.tdp === 'number' ? cpu.tdp : undefined,
+            },
+          };
+        });
         setCpus(cpus);
       } catch {
         // Si quieres mostrar un mensaje de error, puedes agregar un estado local aquí
@@ -473,9 +480,11 @@ const PCConfigurator = () => {
                         onClick={() => updateComponent(selectedCategory, isSelected ? null : component)}
                       >
                         <div className="pc-configurator-component-card-content">
-                          <img
+                          <Image
                             src={component.image || "/placeholder.svg"}
                             alt={component.name}
+                            width={80}
+                            height={80}
                             className="pc-configurator-component-thumbnail-image"
                           />
                           <div className="pc-configurator-component-info-section">
@@ -651,7 +660,7 @@ const PCConfigurator = () => {
 
                 <div className="pc-configurator-preview-card-container">
                   <div className="pc-configurator-preview-image-wrapper">
-                    <img src="/placeholder.svg?height=200&width=200" alt="PC Build Preview" />
+                    <Image src="/placeholder.svg?height=200&width=200" alt="PC Build Preview" width={200} height={200} />
                   </div>
 
                   <div className="pc-configurator-preview-info-section">
