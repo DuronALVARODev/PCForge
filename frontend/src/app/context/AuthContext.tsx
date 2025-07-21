@@ -9,6 +9,7 @@ interface User {
   email: string;
   username: string;
   createdAt?: string;
+  role?: string;
 }
 
 interface LoginCredentials {

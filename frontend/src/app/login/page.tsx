@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '../context/AuthContext';
+import { useRouter } from 'next/navigation';
 import './login.css';
 
 const formSchema = z.object({
@@ -23,12 +24,22 @@ type FormData = z.infer<typeof formSchema>;
 const LoginPage = () => {
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, user } = useAuth();
+  const router = useRouter();
 
-  // Cambiar el título dinámicamente
+  // Cambiar el título dinámicamente y redirigir si ya está autenticado
   useEffect(() => {
     document.title = 'Iniciar Sesión';
-  }, []);
+    if (user) {
+      // Redirigir según el rol si ya está autenticado
+      // @ts-ignore
+      if (user.role === 'admin' || user.role === 'superadmin') {
+        router.push('/admin');
+      } else {
+        router.push('/pc-build');
+      }
+    }
+  }, [user, router]);
 
   const {
     register,
