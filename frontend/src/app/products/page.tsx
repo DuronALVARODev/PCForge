@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 // import { useAuth } from '../context/AuthContext';
 // import ProtectedRoute from '@/components/ProtectedRoute';
 import './products.css';
@@ -191,13 +192,11 @@ const ComponentCarousel: React.FC<ComponentCarouselProps> = ({ category, compone
           {components.map((component: ComponentType) => (
             <div key={component.id} className="component-card">
               <div className="component-image">
-                <img src={component.image} alt={component.name} />
-              {/* TODO: Cambiar por <Image /> de next/image para optimización */}
-                
+                <Image src={component.image} alt={component.name} width={200} height={150} style={{objectFit: 'cover'}} />
               </div>
               <div className="component-info">
                 <h3 className="component-name">{component.name}</h3>
-                <p className="component-brand">{(component as any).brand}</p>
+                <p className="component-brand">{'brand' in component ? component.brand : ''}</p>
                 <div className="component-specs">
                   {'cores' in component && <span className="spec-badge">Núcleos: {(component as CPU).cores}</span>}
                   {'frequency' in component && <span className="spec-badge">Frecuencia: {(component as CPU).frequency}</span>}
@@ -247,7 +246,17 @@ const ComponentsPage = () => {
         if (!res.ok) throw new Error("Error al obtener CPUs");
         const data = await res.json();
         // Mapear los datos de la API al formato CPU
-        const cpus: CPU[] = data.map((cpu: any) => ({
+        const cpus: CPU[] = data.map((cpu: {
+          id: number;
+          name: string;
+          manufacturer?: string;
+          best_price?: number;
+          raw_data?: { price?: number };
+          tdp?: number;
+          rating?: number;
+          cores_total?: number;
+          clock_base?: number;
+        }) => ({
           id: cpu.id,
           name: cpu.name,
           brand: cpu.manufacturer || "",
