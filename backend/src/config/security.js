@@ -82,10 +82,10 @@ module.exports = {
             'http://localhost:4000',
             'https://pc-forge-smoky.vercel.app'
         ],
-        credentials: true,                  // Permitir cookies
+        credentials: true,
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        exposedHeaders: ['Set-Cookie'],
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-        exposedHeaders: ['X-Total-Count', 'X-Rate-Limit-Remaining'],
         maxAge: 86400,                      // 24 horas
         preflightContinue: false,
         optionsSuccessStatus: 204

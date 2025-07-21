@@ -8,17 +8,22 @@ const prisma = new PrismaClient();
  */
 const authMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization;
+  // Obtener el token de la cabecera o de la cookie (prioridad: header, luego cookie)
   let token = null;
-  if (authHeader?.startsWith('Bearer ')) {
-    token = authHeader.split(' ')[1];
-  }
-  if (!token && req.cookies?.accessToken) {
+  if (req.headers['authorization'] && req.headers['authorization'].startsWith('Bearer ')) {
+    token = req.headers['authorization'].slice(7);
+  } else if (req.cookies && req.cookies.accessToken) {
     token = req.cookies.accessToken;
   }
   if (!token && req.cookies?.refreshToken) {
     token = req.cookies.refreshToken;
   }
   if (!token) {
+    // Si no hay token, intentar refrescar usando refreshToken
+    if (req.cookies && req.cookies.refreshToken) {
+      req.refreshToken = req.cookies.refreshToken;
+      return next();
+    }
     return res.status(401).json({ message: 'No token provided' });
   }
   try {

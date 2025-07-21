@@ -88,11 +88,11 @@ const login = async (req, res) => {
             return res.status(400).json({ message: "Formato de email inválido", code: 'LOGIN_INVALID_EMAIL' });
         }
         const tokens = await loginUser(email, password);
-        // Configurar cookies seguras
+        // Configurar cookies seguras para cross-origin
         const cookieOptions = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax',
+            secure: true, // Siempre true para cross-origin
+            sameSite: 'None', // Necesario para cross-origin
             path: '/',
             domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : undefined
         };
