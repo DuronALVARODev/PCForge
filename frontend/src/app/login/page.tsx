@@ -32,7 +32,6 @@ const LoginPage = () => {
     document.title = 'Iniciar Sesión';
     if (user) {
       // Redirigir según el rol si ya está autenticado
-      // @ts-ignore
       if (user.role === 'admin' || user.role === 'superadmin') {
         router.push('/admin');
       } else {
