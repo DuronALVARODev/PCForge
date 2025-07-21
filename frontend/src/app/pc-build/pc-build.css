@@ -1,0 +1,916 @@
+/* Reset y variables específicas para PC Configurator */
+.pc-configurator-app-wrapper  {
+  padding-top: 70px;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.pc-configurator-app-wrapper {
+  --pc-config-bg-primary: #ffffff;
+  --pc-config-bg-secondary: #f8f9fa;
+  --pc-config-bg-tertiary: #e9ecef;
+  --pc-config-bg-card: #ffffff;
+  --pc-config-border-color: #dee2e6;
+  --pc-config-text-primary: #212529;
+  --pc-config-text-secondary: #6c757d;
+  --pc-config-text-muted: #adb5bd;
+  --pc-config-accent-primary: #000000;
+  --pc-config-accent-hover: #2c2c2c;
+  --pc-config-success: #28a745;
+  --pc-config-warning: #ffc107;
+  --pc-config-danger: #dc3545;
+  --pc-config-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --pc-config-shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --pc-config-border-radius: 12px;
+  --pc-config-transition: all 0.3s ease;
+}
+
+.pc-configurator-app-wrapper {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--pc-config-bg-primary);
+  color: var(--pc-config-text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header específico */
+.pc-configurator-main-header {
+  background-color: var(--pc-config-bg-primary);
+  border-bottom: 1px solid var(--pc-config-border-color);
+  padding: 1rem 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--pc-config-shadow);
+}
+
+.pc-configurator-header-content-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 100%;
+}
+
+.pc-configurator-header-left-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pc-configurator-sidebar-toggle-btn {
+  background: none;
+  border: none;
+  color: var(--pc-config-text-primary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.75rem;
+  border-radius: var(--pc-config-border-radius);
+  transition: var(--pc-config-transition);
+}
+
+.pc-configurator-sidebar-toggle-btn:hover {
+  background-color: var(--pc-config-bg-secondary);
+}
+
+.pc-configurator-main-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--pc-config-text-primary);
+  letter-spacing: -0.025em;
+}
+
+.pc-configurator-main-subtitle {
+  font-size: 0.875rem;
+  color: var(--pc-config-text-secondary);
+  font-weight: 400;
+}
+
+.pc-configurator-header-right-section {
+  margin-left: auto;
+}
+
+.pc-configurator-user-menu-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pc-configurator-user-avatar-circle {
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: var(--pc-config-accent-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: white;
+}
+
+.pc-configurator-user-display-name {
+  color: var(--pc-config-text-primary);
+  font-weight: 500;
+}
+
+.pc-configurator-main-layout-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Sidebar específico */
+.pc-configurator-navigation-sidebar {
+  width: 280px;
+  background-color: var(--pc-config-bg-secondary);
+  border-right: 1px solid var(--pc-config-border-color);
+  transition: var(--pc-config-transition);
+  overflow-y: auto;
+}
+
+.pc-configurator-sidebar-collapsed {
+  width: 0;
+  overflow: hidden;
+}
+
+.pc-configurator-sidebar-content-wrapper {
+  padding: 1.5rem;
+}
+
+.pc-configurator-sidebar-header-section h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--pc-config-text-secondary);
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.875rem;
+}
+
+.pc-configurator-sidebar-navigation-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pc-configurator-nav-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: none;
+  border: none;
+  border-radius: var(--pc-config-border-radius);
+  color: var(--pc-config-text-secondary);
+  cursor: pointer;
+  transition: var(--pc-config-transition);
+  text-align: left;
+  width: 100%;
+  font-weight: 500;
+}
+
+.pc-configurator-nav-menu-item:hover {
+  background-color: var(--pc-config-bg-tertiary);
+  color: var(--pc-config-text-primary);
+}
+
+.pc-configurator-nav-item-selected {
+  background-color: var(--pc-config-accent-primary);
+  color: white;
+}
+
+.pc-configurator-nav-item-label {
+  flex: 1;
+}
+
+.pc-configurator-nav-item-status-badge {
+  background-color: var(--pc-config-success);
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.pc-configurator-content-area-wrapper {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Main content específico */
+.pc-configurator-main-content-section {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  background-color: var(--pc-config-bg-primary);
+}
+
+.pc-configurator-component-selector-container {
+  max-width: 100%;
+}
+
+.pc-configurator-selector-header-section {
+  margin-bottom: 2rem;
+}
+
+.pc-configurator-selector-header-section h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--pc-config-text-primary);
+  letter-spacing: -0.025em;
+}
+
+.pc-configurator-selector-header-section p {
+  color: var(--pc-config-text-secondary);
+  font-size: 1.125rem;
+}
+
+/* Filters específicos */
+.pc-configurator-filters-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: var(--pc-config-bg-card);
+  border-radius: var(--pc-config-border-radius);
+  border: 1px solid var(--pc-config-border-color);
+  margin-bottom: 2rem;
+  box-shadow: var(--pc-config-shadow);
+}
+
+.pc-configurator-search-input-container {
+  position: relative;
+  flex: 1;
+  min-width: 250px;
+}
+
+.pc-configurator-search-input-container svg {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--pc-config-text-muted);
+}
+
+.pc-configurator-search-text-input {
+  width: 100%;
+  padding: 0.875rem 0.875rem 0.875rem 2.75rem;
+  background-color: var(--pc-config-bg-secondary);
+  border: 1px solid var(--pc-config-border-color);
+  border-radius: var(--pc-config-border-radius);
+  color: var(--pc-config-text-primary);
+  font-size: 0.875rem;
+  transition: var(--pc-config-transition);
+}
+
+.pc-configurator-search-text-input:focus {
+  outline: none;
+  border-color: var(--pc-config-accent-primary);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.pc-configurator-brand-filters-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pc-configurator-filter-brand-btn {
+  padding: 0.625rem 1rem;
+  background: var(--pc-config-bg-primary);
+  border: 1px solid var(--pc-config-border-color);
+  border-radius: var(--pc-config-border-radius);
+  color: var(--pc-config-text-secondary);
+  cursor: pointer;
+  transition: var(--pc-config-transition);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.pc-configurator-filter-brand-btn:hover {
+  background-color: var(--pc-config-bg-secondary);
+  color: var(--pc-config-text-primary);
+  border-color: var(--pc-config-text-muted);
+}
+
+.pc-configurator-filter-btn-selected {
+  background-color: var(--pc-config-accent-primary);
+  border-color: var(--pc-config-accent-primary);
+  color: white;
+}
+
+/* Components list específico */
+.pc-configurator-components-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pc-configurator-component-card {
+  background-color: var(--pc-config-bg-card);
+  border: 1px solid var(--pc-config-border-color);
+  border-radius: var(--pc-config-border-radius);
+  cursor: pointer;
+  transition: var(--pc-config-transition);
+  box-shadow: var(--pc-config-shadow);
+}
+
+.pc-configurator-component-card:hover {
+  border-color: var(--pc-config-text-muted);
+  box-shadow: var(--pc-config-shadow-lg);
+  transform: translateY(-2px);
+}
+
+.pc-configurator-component-card-selected {
+  border-color: var(--pc-config-accent-primary);
+  background-color: rgba(0, 0, 0, 0.02);
+  box-shadow: 0 0 0 1px var(--pc-config-accent-primary);
+}
+
+.pc-configurator-component-card-warning {
+  border-left: 4px solid var(--pc-config-danger);
+}
+
+.pc-configurator-component-card-content {
+  padding: 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.pc-configurator-component-thumbnail-image {
+  width: 100px;
+  height: 100px;
+  object-fit:contain;
+  border-radius: var(--pc-config-border-radius);
+  background-color: var(--pc-config-bg-secondary);
+}
+
+.pc-configurator-component-info-section {
+  flex: 1;
+}
+
+.pc-configurator-component-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.pc-configurator-component-name-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--pc-config-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.pc-configurator-component-brand-label {
+  color: var(--pc-config-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.pc-configurator-component-price-section {
+  text-align: right;
+}
+
+.pc-configurator-component-price-amount {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--pc-config-text-primary);
+}
+
+.pc-configurator-selected-status-badge {
+  background-color: var(--pc-config-accent-primary);
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--pc-config-border-radius);
+  margin-top: 0.25rem;
+  display: inline-block;
+  font-weight: 500;
+}
+
+.pc-configurator-component-specs-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.pc-configurator-spec-info-badge {
+  background: var(--pc-config-bg-secondary);
+  border: 1px solid var(--pc-config-border-color);
+  color: var(--pc-config-text-secondary);
+  font-size: 0.75rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--pc-config-border-radius);
+  font-weight: 500;
+}
+
+.pc-configurator-compatibility-issues-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pc-configurator-compatibility-issue-alert {
+  font-size: 0.875rem;
+  padding: 0.75rem;
+  border-radius: var(--pc-config-border-radius);
+  border: 1px solid;
+}
+
+.pc-configurator-issue-error-type {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: var(--pc-config-danger);
+  border-color: rgba(220, 53, 69, 0.3);
+}
+
+.pc-configurator-issue-warning-type {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: var(--pc-config-warning);
+  border-color: rgba(255, 193, 7, 0.3);
+}
+
+.pc-configurator-no-results-container {
+  text-align: center;
+  padding: 4rem;
+}
+
+.pc-configurator-no-results-container p {
+  color: var(--pc-config-text-secondary);
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+}
+
+/* Right panel específico */
+.pc-configurator-right-panel-sidebar {
+  width: 384px;
+  border-left: 1px solid var(--pc-config-border-color);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--pc-config-bg-secondary);
+}
+
+.pc-configurator-build-summary-section {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.pc-configurator-summary-header-wrapper {
+  margin-bottom: 1.5rem;
+}
+
+.pc-configurator-summary-header-wrapper h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--pc-config-text-primary);
+}
+
+.pc-configurator-summary-stats-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pc-configurator-summary-stats-display p {
+  color: var(--pc-config-text-secondary);
+  font-size: 0.875rem;
+}
+
+.pc-configurator-total-price-display {
+  text-align: right;
+}
+
+.pc-configurator-price-amount-large {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--pc-config-text-primary);
+}
+
+.pc-configurator-price-label-text {
+  color: var(--pc-config-text-secondary);
+  font-size: 0.875rem;
+}
+
+.pc-configurator-summary-components-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pc-configurator-summary-item-wrapper {
+  background-color: var(--pc-config-bg-card);
+  border: 1px solid var(--pc-config-border-color);
+  border-radius: var(--pc-config-border-radius);
+  padding: 1rem;
+  box-shadow: var(--pc-config-shadow);
+}
+
+.pc-configurator-summary-item-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.pc-configurator-summary-item-header-row h4 {
+  font-weight: 600;
+  color: var(--pc-config-text-primary);
+}
+
+.pc-configurator-summary-actions-group {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.pc-configurator-action-btn-small {
+  background: none;
+  border: none;
+  color: var(--pc-config-text-secondary);
+  cursor: pointer;
+  padding: 0.375rem;
+  border-radius: 6px;
+  transition: var(--pc-config-transition);
+}
+
+.pc-configurator-action-btn-small:hover {
+  color: var(--pc-config-text-primary);
+  background-color: var(--pc-config-bg-tertiary);
+}
+
+.pc-configurator-action-btn-danger:hover {
+  color: var(--pc-config-danger);
+}
+
+.pc-configurator-summary-component-details .pc-configurator-component-name-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--pc-config-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.pc-configurator-component-details-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pc-configurator-component-brand-text {
+  font-size: 0.75rem;
+  color: var(--pc-config-text-secondary);
+}
+
+.pc-configurator-component-price-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--pc-config-text-primary);
+}
+
+.pc-configurator-summary-empty-state {
+  font-size: 0.875rem;
+  color: var(--pc-config-text-muted);
+  cursor: pointer;
+  transition: var(--pc-config-transition);
+}
+
+.pc-configurator-summary-empty-state:hover {
+  color: var(--pc-config-text-secondary);
+}
+
+.pc-configurator-summary-total-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--pc-config-border-color);
+}
+
+.pc-configurator-total-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pc-configurator-total-line-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--pc-config-text-secondary);
+}
+
+.pc-configurator-total-final-amount {
+  font-weight: 700;
+  color: var(--pc-config-text-primary);
+  font-size: 1.25rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--pc-config-border-color);
+}
+
+/* Build preview específico */
+.pc-configurator-build-preview-section {
+  border-top: 1px solid var(--pc-config-border-color);
+  padding: 1.5rem;
+}
+
+.pc-configurator-build-preview-section h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.pc-configurator-preview-card-container {
+  background-color: var(--pc-config-bg-card);
+  border: 1px solid var(--pc-config-border-color);
+  border-radius: var(--pc-config-border-radius);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--pc-config-shadow);
+}
+
+.pc-configurator-preview-image-wrapper {
+  aspect-ratio: 1;
+  background-color: var(--pc-config-bg-secondary);
+  border-radius: var(--pc-config-border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.pc-configurator-preview-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--pc-config-border-radius);
+  opacity: 0.8;
+}
+
+.pc-configurator-preview-info-section {
+  text-align: center;
+}
+
+.pc-configurator-preview-title-text {
+  font-weight: 600;
+  color: var(--pc-config-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.pc-configurator-preview-subtitle-text {
+  font-size: 0.875rem;
+  color: var(--pc-config-text-secondary);
+}
+
+.pc-configurator-preview-actions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pc-configurator-action-buttons-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.pc-configurator-auth-notice-container {
+  text-align: center;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: var(--pc-config-border-radius);
+  border: 1px solid var(--pc-config-border-color);
+  margin-top: 1rem;
+}
+
+.pc-configurator-auth-notice-container p {
+  color: var(--pc-config-text-secondary);
+  font-size: 0.875rem;
+}
+
+/* Buttons específicos */
+.pc-configurator-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  border-radius: var(--pc-config-border-radius);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--pc-config-transition);
+  border: none;
+  text-decoration: none;
+  letter-spacing: 0.025em;
+}
+
+.pc-configurator-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pc-configurator-btn-primary {
+  background-color: var(--pc-config-accent-primary);
+  color: white;
+}
+
+.pc-configurator-btn-primary:hover:not(:disabled) {
+  background-color: var(--pc-config-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--pc-config-shadow-lg);
+}
+
+.pc-configurator-btn-success {
+  background-color: var(--pc-config-success);
+  color: white;
+}
+
+.pc-configurator-btn-success:hover:not(:disabled) {
+  background-color: #218838;
+  transform: translateY(-1px);
+  box-shadow: var(--pc-config-shadow-lg);
+}
+
+.pc-configurator-btn-danger {
+  background-color: var(--pc-config-danger);
+  color: white;
+}
+
+.pc-configurator-btn-danger:hover:not(:disabled) {
+  background-color: #c82333;
+  transform: translateY(-1px);
+  box-shadow: var(--pc-config-shadow-lg);
+}
+
+.pc-configurator-btn-outline {
+  background: var(--pc-config-bg-primary);
+  border: 1px solid var(--pc-config-border-color);
+  color: var(--pc-config-text-primary);
+}
+
+.pc-configurator-btn-outline:hover:not(:disabled) {
+  background-color: var(--pc-config-bg-secondary);
+  border-color: var(--pc-config-text-muted);
+  transform: translateY(-1px);
+  box-shadow: var(--pc-config-shadow);
+}
+
+.pc-configurator-btn-ghost {
+  background: none;
+  border: none;
+  color: var(--pc-config-text-secondary);
+}
+
+.pc-configurator-btn-ghost:hover:not(:disabled) {
+  background-color: var(--pc-config-bg-secondary);
+  color: var(--pc-config-text-primary);
+}
+
+.pc-configurator-btn-full-width {
+  width: 100%;
+}
+
+/* Paginación para PC Configurator */
+.pc-configurator-pagination-container {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  gap: 0.5rem;
+
+}
+
+.pc-configurator-pagination-btn {
+  background: var(--pc-config-bg-card);
+  border: 1.5px solid var(--pc-config-border-color);
+  color: var(--pc-config-text-primary);
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pc-configurator-pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pc-configurator-pagination-btn.active, .pc-configurator-pagination-btn:focus {
+  background: var(--pc-config-accent-primary);
+  color: #fff;
+  border-color: var(--pc-config-accent-primary);
+}
+
+.pc-configurator-pagination-btn:hover:not(:disabled) {
+  background: var(--pc-config-bg-secondary);
+  border-color: var(--pc-config-text-muted);
+  color: var(--pc-config-accent-primary);
+}
+
+.pc-configurator-pagination-arrow {
+  font-size: 1.3rem;
+  font-weight: bold;
+  padding: 0 0.5rem;
+  user-select: none;
+}
+
+/* Responsive específico */
+@media (max-width: 1024px) {
+  .pc-configurator-right-panel-sidebar {
+    width: 320px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pc-configurator-main-layout-container {
+    flex-direction: column;
+  }
+
+  .pc-configurator-navigation-sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+  }
+
+  .pc-configurator-sidebar-collapsed {
+    width: 100%;
+    height: 0;
+  }
+
+  .pc-configurator-content-area-wrapper {
+    flex-direction: column;
+  }
+
+  .pc-configurator-right-panel-sidebar {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--pc-config-border-color);
+  }
+
+  .pc-configurator-filters-container {
+    flex-direction: column;
+  }
+
+  .pc-configurator-search-input-container {
+    min-width: auto;
+  }
+
+  .pc-configurator-component-card-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .pc-configurator-component-header-row {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .pc-configurator-action-buttons-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pc-configurator-main-content-section {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pc-configurator-main-header {
+    padding: 1rem;
+  }
+
+  .pc-configurator-main-title {
+    font-size: 1.5rem;
+  }
+
+  .pc-configurator-main-content-section {
+    padding: 1rem;
+  }
+
+  .pc-configurator-build-summary-section,
+  .pc-configurator-build-preview-section {
+    padding: 1rem;
+  }
+
+  .pc-configurator-component-card {
+    margin: 0 -0.5rem;
+  }
+
+  .pc-configurator-selector-header-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .pc-configurator-filters-container {
+    padding: 1rem;
+  }
+}

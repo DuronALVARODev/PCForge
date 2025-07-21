@@ -1,0 +1,149 @@
+# Evidencia de Seguridad y Buenas Prácticas en la App Web
+
+## 1. Integración en la App Web
+
+### a) Validación de datos (cliente y servidor)
+- **Cliente:**
+  - Implementado con Zod + React Hook Form.
+  - Ejemplo:
+    ```tsx
+    // frontend/src/app/profile/page.tsx
+    const shippingSchema = z.object({
+      fullName: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
+      phone: z.string().min(10, 'El teléfono debe tener al menos 10 dígitos'),
+      // ...
+    });
+    ```
+  - Captura sugerida: Formulario mostrando mensaje de error al ingresar datos inválidos.
+
+- **Servidor:**
+  - Implementado con express-validator y sanitización (xss).
+  - Ejemplo:
+    ```js
+    // backend/src/routes/auth.routes.js
+    router.post(
+      "/register",
+      [
+        body("email").isEmail().withMessage("Email inválido"),
+        body("username").isLength({ min: 3, max: 30 }).withMessage("El nombre de usuario debe tener entre 3 y 30 caracteres"),
+        body("password").isLength({ min: 8 }).withMessage("La contraseña debe tener al menos 8 caracteres"),
+        body("confirmPassword").exists().withMessage("Debes confirmar la contraseña")
+      ],
+      register
+    );
+    ```
+  - Captura sugerida: Respuesta de error JSON del backend ante datos inválidos.
+
+### b) HTTPS y políticas CSP
+- **HTTPS:**
+  - Preparado para producción (cookies secure, headers). En desarrollo se usa HTTP, pero en producción se recomienda Nginx o similar para forzar HTTPS.
+  - Ejemplo:
+    ```js
+    // backend/src/controllers/auth.controller.js
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax',
+    };
+    ```
+- **CSP:**
+  - Implementado con Helmet.
+  - Ejemplo:
+    ```js
+    // backend/src/server.js
+    const helmet = require("helmet");
+    app.use(helmet(securityConfig.helmet));
+    ```
+  - Captura sugerida: Headers de respuesta mostrando Content-Security-Policy.
+
+### c) Roles y privilegios de acceso
+- **Estado:**
+  - Actualmente solo hay autenticación básica (usuarios autenticados pueden acceder a rutas protegidas).
+  - **NO** está implementado control de roles (admin, user, etc.).
+  - Ejemplo de autenticación:
+    ```js
+    // backend/src/middlewares/auth.middleware.js
+    async function authMiddleware(req, res, next) {
+      // ...verifica JWT y adjunta usuario a la request
+    }
+    ```
+  - Para roles, se recomienda agregar un campo `role` al modelo de usuario y un middleware de autorización.
+
+---
+
+## 2. Documentación con Capturas y Código
+- Se recomienda adjuntar capturas de pantalla de:
+  - Formularios mostrando validación en el cliente.
+  - Respuestas de error del backend.
+  - Headers de seguridad en el navegador (CSP, etc.).
+- El código relevante ya está incluido en los ejemplos anteriores.
+
+---
+
+## 3. Evaluación de Buenas Prácticas
+- **Validación de datos:** ✔️ Cliente y servidor.
+- **Sanitización:** ✔️ Uso de xss y express-validator.
+- **HTTPS:** ✔️ Preparado para producción, pendiente en desarrollo.
+- **CSP y headers:** ✔️ Helmet implementado.
+- **Autenticación:** ✔️ JWT y rutas protegidas.
+- **Roles:** ❌ No implementado (solo autenticación básica).
+- **Separación de lógica:** ✔️ Controladores, servicios y rutas separados.
+- **Rate limiting:** ✔️ Middleware de rate limit.
+- **Logs de seguridad:** ✔️ Logging de eventos de seguridad.
+
+---
+
+## 4. Servicio Web Propio (REST)
+- **Tipo:** REST
+- **Recurso:** Lista de CPUs
+- **Endpoint:**
+  ```js
+  // backend/src/routes/cpu.routes.js
+  router.get('/', cpuController.getAllCPUs);
+  ```
+- **Controlador:**
+  ```js
+  // backend/src/controllers/cpu.controller.js
+  exports.getAllCPUs = async (req, res) => {
+    try {
+      const cpus = await cpuService.getAllCPUs();
+      res.json(cpus);
+    } catch (error) {
+      res.status(500).json({ error: 'Error al obtener CPUs', details: error.message });
+    }
+  };
+  ```
+- **Servicio:**
+  ```js
+  // backend/src/services/cpu.service.js
+  async function getAllCPUs() {
+    return prisma.cPU.findMany();
+  }
+  ```
+- **Consumo desde el frontend:**
+  ```tsx
+  // frontend/src/app/pc-build/page.tsx
+  useEffect(() => {
+    fetch("/api/cpus")
+      .then(res => res.json())
+      .then(data => setCpus(data));
+  }, []);
+  ```
+- **Respuesta de ejemplo:**
+  ```json
+  [
+    {
+      "id": "ckz...",
+      "name": "Intel Core i7-12700K",
+      "manufacturer": "Intel",
+      // ...
+    },
+    ...
+  ]
+  ```
+
+---
+
+## Conclusión
+- El proyecto cumple con la mayoría de las buenas prácticas y requisitos de seguridad solicitados, excepto el control de roles, que no está implementado explícitamente.
+- Si se requiere control de roles, debe agregarse al modelo de usuario y a los middlewares.

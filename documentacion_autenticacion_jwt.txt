@@ -1,0 +1,297 @@
+# Documentación: Mecanismo de Autenticación Remota (JWT) en PCForge
+
+## ¿Cómo funciona la autenticación remota en PCForge?
+
+### 1. Login y generación de tokens (backend)
+- El usuario inicia sesión enviando email y contraseña a `POST /api/auth/login`.
+- El backend valida credenciales y, si son correctas, genera dos JWT:
+  - **accessToken** (15 minutos, firmado con `JWT_SECRET`)
+  - **refreshToken** (7 días, firmado con `JWT_REFRESH_SECRET`)
+- Ambos tokens se envían al frontend como cookies HTTP Only (`accessToken`, `refreshToken`).
+- El refreshToken también se almacena en la base de datos del usuario.
+
+**Ubicación del código:**
+- Lógica de login y generación de tokens:  
+  `backend/src/services/auth.service.js` (función `loginUser`, líneas 36-61)
+- Controlador de login y seteo de cookies:  
+  `backend/src/controllers/auth.controller.js` (función `login`, líneas 61-120)
+
+### 2. Autenticación en cada petición protegida
+- El frontend NO envía manualmente el token, sino que el navegador lo incluye automáticamente en las cookies.
+- El backend extrae el token de:
+  - Header `Authorization: Bearer ...` (si existe)
+  - Cookie `accessToken` (preferido)
+  - Cookie `refreshToken` (como fallback)
+- El middleware `authMiddleware` valida el JWT y, si es válido, adjunta el usuario a `req.user`.
+
+**Ubicación del código:**
+- Middleware de autenticación:  
+  `backend/src/middlewares/auth.middleware.js` (líneas 7-50)
+- Uso en rutas protegidas:  
+  `backend/src/routes/auth.routes.js` (líneas 36-41, rutas `/me`, `/logout`, `/verify`)
+
+### 3. Control de roles y privilegios
+- El campo `role` se incluye en el JWT y se adjunta a `req.user`.
+- El middleware `requireRole` verifica que el usuario tenga el rol adecuado antes de permitir el acceso a rutas protegidas.
+
+**Ubicación del código:**
+- Middleware de roles:  
+  `backend/src/middlewares/requireRole.middleware.js` (líneas 1-10)
+- Uso en rutas protegidas:  
+  `backend/src/routes/admin.routes.js` y otras rutas de administración
+
+### 4. Validación de sesión en el frontend
+- El frontend, al cargar, hace una petición a `GET /api/auth/me` (con credenciales/cookies).
+- Si la sesión es válida, el backend responde con los datos del usuario.
+- El contexto de autenticación (`frontend/src/app/context/AuthContext.tsx`) gestiona el estado del usuario y la sesión.
+- El login y logout se hacen siempre usando cookies (`withCredentials: true` en axios).
+
+**Ubicación del código:**
+- Validación de sesión y login:  
+  `frontend/src/app/context/AuthContext.tsx` (líneas 61-118)
+- Página de login:  
+  `frontend/src/app/login/page.tsx`
+- Protección de rutas en frontend:  
+  `frontend/src/components/ProtectedRoute.tsx`
+
+### 5. Logout
+- El frontend llama a `POST /api/auth/logout`.
+- El backend elimina el refreshToken de la base de datos y limpia las cookies.
+
+**Ubicación del código:**
+- Logout backend:  
+  `backend/src/controllers/auth.controller.js` (líneas 121-180)
+- Logout frontend:  
+  `frontend/src/app/context/AuthContext.tsx` (líneas 90-105)
+
+---
+
+## Resumen técnico
+
+- **Tokens:** JWT, enviados y almacenados únicamente como cookies HTTP Only (no localStorage).
+- **Validación:** El backend valida tokens en cada petición protegida, y el frontend nunca manipula tokens directamente.
+- **Roles:** El control de acceso por rol se hace en el backend, usando el campo `role` del JWT.
+- **Renovación:** El refreshToken permite renovar la sesión sin re-login, y se almacena en la base de datos y en cookie.
+- **Logout:** Elimina el refreshToken y limpia cookies.
+
+---
+
+## Ejemplo de flujo real
+
+1. **Login:**
+   - El usuario envía email y contraseña a `/api/auth/login`.
+   - El backend responde con cookies `accessToken` y `refreshToken` (HTTP Only).
+2. **Validación de sesión:**
+   - El frontend consulta `/api/auth/me` para obtener los datos del usuario autenticado.
+3. **Acceso a rutas protegidas:**
+   - El backend valida el token de las cookies en cada petición.
+4. **Logout:**
+   - El frontend llama a `/api/auth/logout` y el backend elimina el refreshToken y limpia cookies.
+
+---
+
+## Conclusión
+El sistema de autenticación remota con JWT implementado en PCForge utiliza cookies HTTP Only para máxima seguridad, nunca expone los tokens al frontend, y controla el acceso por roles desde el backend. Todo el flujo está documentado y referenciado con archivos y líneas reales del proyecto.
+
+---
+
+## Código fuente relevante
+
+### backend/src/services/auth.service.js (fragmento de loginUser y generación de tokens)
+```js
+async function loginUser(email, password) {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) throw new Error('El usuario no existe');
+    if (!user.isVerified) throw new Error('La cuenta no ha sido verificada');
+    const valid = await bycrypt.compare(password, user.password || user.passwordHash);
+    if (!valid) throw new Error('Contraseña incorrecta');
+    // Generar tokens
+    const accessToken = jwt.sign(
+        { userId: user.id, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: '15m' }
+    );
+    const refreshToken = jwt.sign(
+        { userId: user.id, role: user.role },
+        process.env.JWT_REFRESH_SECRET,
+        { expiresIn: '7d' }
+    );
+    // Guardar refreshToken en DB
+    await prisma.user.update({
+        where: { id: user.id },
+        data: { refreshToken }
+    });
+    return { accessToken, refreshToken };
+}
+```
+
+### backend/src/controllers/auth.controller.js (fragmento de login y logout)
+```js
+// Controlador de login de usuario
+async function login(req, res) {
+    // ...validaciones...
+    try {
+        let { email, password } = req.body;
+        email = xss(sanitizeInput(email)).toLowerCase();
+        password = xss(password);
+        if (!isValidEmail(email)) {
+            // ...
+        }
+        const tokens = await loginUser(email, password);
+        // Configurar cookies seguras
+        const cookieOptions = {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax',
+            path: '/',
+            domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : undefined
+        };
+        // Guardar refreshToken en cookie
+        res.cookie('refreshToken', tokens.refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
+        // Guardar accessToken en cookie
+        res.cookie('accessToken', tokens.accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
+        // ...
+        res.json({ message: "Inicio de sesión exitoso", code: 'LOGIN_SUCCESS' });
+    } catch (error) {
+        // ...
+    }
+}
+
+// Controlador de logout
+async function logout(req, res) {
+    try {
+        if (req.user?.id) {
+            await prisma.user.update({ where: { id: req.user.id }, data: { refreshToken: null } });
+        }
+        const cookieOptions = {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax',
+            path: '/',
+            domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : undefined
+        };
+        res.clearCookie('accessToken', cookieOptions);
+        res.clearCookie('refreshToken', cookieOptions);
+        res.json({ message: "Logout exitoso", code: 'LOGOUT_SUCCESS' });
+    } catch (error) {
+        // ...
+    }
+}
+```
+
+### backend/src/middlewares/auth.middleware.js
+```js
+// Middleware de autenticación JWT
+async function authMiddleware(req, res, next) {
+    const authHeader = req.headers.authorization;
+    let token = null;
+    if (authHeader?.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
+    }
+    if (!token && req.cookies?.accessToken) {
+        token = req.cookies.accessToken;
+    }
+    if (!token && req.cookies?.refreshToken) {
+        token = req.cookies.refreshToken;
+    }
+    if (!token) {
+        return res.status(401).json({ message: 'No token provided' });
+    }
+    try {
+        token = xss(token);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await prisma.user.findUnique({
+            where: { id: decoded.userId },
+            select: { id: true, email: true, username: true, createdAt: true, isVerified: true, role: true }
+        });
+        if (!user) {
+            return res.status(401).json({ message: 'Usuario no encontrado' });
+        }
+        req.user = user;
+        next();
+    } catch (err) {
+        return res.status(401).json({ message: 'Token inválido' });
+    }
+}
+```
+
+### backend/src/middlewares/requireRole.middleware.js
+```js
+// Middleware para proteger rutas según el rol del usuario
+module.exports = function requireRole(roles) {
+  return function (req, res, next) {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({ message: 'Acceso denegado: privilegios insuficientes.' });
+    }
+    next();
+  };
+};
+```
+
+### frontend/src/app/context/AuthContext.tsx (fragmento de login y logout)
+```tsx
+const login = async (credentials: LoginCredentials) => {
+  try {
+    // Hacer login
+    const loginRes = await axios.post(`${API_BASE_URL}/login`, credentials, {
+      withCredentials: true,
+    });
+    // Obtener datos del usuario después del login
+    const userRes = await axios.get(`${API_BASE_URL}/me`, { withCredentials: true });
+    setUser(userRes.data);
+    // Redirigir según el rol
+    const role = userRes.data.role;
+    if (role === "admin" || role === "superadmin") {
+      router.push("/admin");
+    } else {
+      router.push("/pc-build");
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+const logout = async () => {
+  try {
+    await axios.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true });
+    setUser(null);
+    router.push('/login');
+  } catch (error) {
+    setUser(null);
+    router.push('/login');
+  }
+};
+```
+
+### frontend/src/components/ProtectedRoute.tsx
+```tsx
+export default function ProtectedRoute({ children, fallback }: ProtectedRouteProps) {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      const currentPath = window.location.pathname;
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+    }
+  }, [user, loading, router]);
+
+  if (loading) {
+    return fallback || (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        fontSize: '1.2rem'
+      }}>
+        Cargando...
+      </div>
+    );
+  }
+  if (!user) {
+    return null;
+  }
+  return <>{children}</>;
+} 
+```

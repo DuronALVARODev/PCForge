@@ -1,0 +1,816 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db{
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+model user{
+  id String @id @default(cuid())
+  email String @unique
+  username String @unique
+  passwordHash String
+  isVerified Boolean @default(false)
+  verificationToken String?
+  tokenExpiry DateTime?
+  refreshToken String? 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  role String @default("user")
+}
+model CPU {
+  id        String @id @default(cuid())
+  opendb_id String? @unique
+
+  // === METADATOS BÁSICOS ===
+  name             String
+  manufacturer     String?
+  series           String?
+  part_numbers     String[]
+  variant          String?
+  release_year     Int?
+
+  // === CAMPOS CRÍTICOS PARA COMPATIBILIDAD (PLANOS) ===
+  // Socket - Crítico para compatibilidad con motherboard
+  socket           String?
+  microarchitecture String?
+  core_family      String?
+
+  // Cores - Críticos para filtros de rendimiento
+  cores_total      Int?
+  cores_performance Int?
+  cores_efficiency  Int?
+  cores_threads    Int?       // Para filtros de threads >= X
+
+  // Clocks - Para comparaciones de rendimiento (en GHz)
+  clock_base       Float?     // Performance cores base
+  clock_boost      Float?     // Performance cores boost
+  clock_eff_base   Float?     // Efficiency cores base
+  clock_eff_boost  Float?     // Efficiency cores boost
+
+  // Cache - Para especificaciones técnicas
+  cache_l1         String?    // Descripción de L1 (compleja)
+  cache_l2         Int?       // L2 en MB
+  cache_l3         Int?       // L3 en MB
+
+  // TDP - Crítico para compatibilidad con PSU y coolers
+  tdp              Int?       // En Watts
+
+  // === INFORMACIÓN DE PRECIOS ===
+  best_price        Float?           // Mejor precio encontrado
+  best_price_url    String?          // URL del mejor precio
+  best_price_store  String?          // Tienda con mejor precio
+  price_updated_at  DateTime?        // Última actualización de precio
+  all_prices        Json?            // Todos los precios encontrados
+  price_scraping_status String?      // SUCCESS, FAILED, PENDING, NO_SKUS
+
+  // === JSON PARA DATOS COMPLEJOS (NO CRÍTICOS) ===
+  integrated_graphics Json?   // Specs completas de gráficos integrados
+  retailer_skus      Json?    // SKUs de tiendas
+  raw_data          Json?     // Respaldo completo del JSON original
+
+  // === TIMESTAMPS ===
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // === ÍNDICES PARA COMPATIBILIDAD RÁPIDA ===
+  @@index([socket])                    // Compatibilidad con motherboard
+  @@index([cores_threads])             // Filtros de rendimiento
+  @@index([clock_boost])               // Comparaciones de velocidad
+  @@index([tdp])                       // Compatibilidad con PSU/coolers
+  @@index([manufacturer, series])      // Búsquedas por marca/serie
+  @@index([microarchitecture])         // Agrupaciones por arquitectura
+  @@index([cores_total, cores_threads]) // Filtros combinados
+  @@index([best_price])                // Filtros por precio
+  @@index([price_updated_at])          // Actualizaciones de precio
+  @@index([price_scraping_status])     // Estado del scraping
+
+  @@map("cpus")
+}
+
+model CPUCooler {
+  id        String @id @default(cuid())
+  opendb_id String? @unique
+
+  // === METADATOS BÁSICOS ===
+  name             String
+  manufacturer     String?
+  series           String?
+  part_numbers     String[]
+  variant          String?
+  release_year     Int?
+
+  // === CAMPOS CRÍTICOS PARA COMPATIBILIDAD (PLANOS) ===
+  // Socket - Crítico para compatibilidad con CPU
+  cpu_sockets      String[]   // ["AM4", "AM5", "LGA1700", etc.]
+  
+  // Dimensiones - Críticas para compatibilidad con case y RAM
+  height           Int?       // Altura en mm - crítico para clearance de case
+  fan_size         Int?       // Tamaño del ventilador en mm (120, 140, etc.)
+  
+  // Tipo de enfriamiento - Crítico para decisiones de compra
+  water_cooled     Boolean?   // true para AIO, false para air cooler
+  fanless          Boolean?   // true para coolers pasivos
+  
+  // Radiador (solo para water cooling) - Crítico para compatibilidad con case
+  radiator_size    Int?       // 120, 240, 280, 360, 420 mm
+  
+  // Ventiladores - Para rendimiento y ruido
+  fan_quantity     Int?       // Número de ventiladores
+  min_fan_rpm      Int?       // RPM mínimo
+  max_fan_rpm      Int?       // RPM máximo
+  
+  // Ruido - Para filtros de experiencia de usuario
+  min_noise_level  Float?     // dBA mínimo
+  max_noise_level  Float?     // dBA máximo
+  
+  // Color/Estética - Para compatibilidad visual
+  color            String[]   // ["BLACK", "WHITE", "RGB", etc.]
+
+  // === ESPECIFICACIONES DE RENDIMIENTO ===
+  // TDP soportado - Crítico para compatibilidad con CPUs de alto rendimiento
+  max_tdp_support  Int?       // TDP máximo que puede enfriar (en Watts)
+  
+  // Características adicionales
+  rgb_lighting     Boolean?   // true si tiene iluminación RGB
+  pwm_control      Boolean?   // true si soporta control PWM
+  
+  // === INFORMACIÓN DE PRECIOS ===
+  best_price        Float?           // Mejor precio encontrado
+  best_price_url    String?          // URL del mejor precio
+  best_price_store  String?          // Tienda con mejor precio
+  price_updated_at  DateTime?        // Última actualización de precio
+  all_prices        Json?            // Todos los precios encontrados
+  price_scraping_status String?      // SUCCESS, FAILED, PENDING, NO_SKUS
+
+  // === JSON PARA DATOS COMPLEJOS (NO CRÍTICOS) ===
+  retailer_skus    Json?      // SKUs de tiendas
+  raw_data         Json?      // Respaldo completo del JSON original
+
+  // === TIMESTAMPS ===
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // === ÍNDICES PARA COMPATIBILIDAD RÁPIDA ===
+  @@index([cpu_sockets])               // Compatibilidad con CPUs
+  @@index([height])                    // Clearance con case
+  @@index([water_cooled])              // Filtros por tipo de enfriamiento
+  @@index([radiator_size])             // Compatibilidad de radiador con case
+  @@index([fan_size])                  // Compatibilidad de ventiladores
+  @@index([max_tdp_support])           // Compatibilidad con CPUs de alto TDP
+  @@index([max_noise_level])           // Filtros por ruido
+  @@index([manufacturer, series])      // Búsquedas por marca/serie
+  @@index([fanless])                   // Coolers pasivos
+  @@index([rgb_lighting])              // Filtros por RGB
+  @@index([color])                     // Filtros por color/estética
+  @@index([best_price])                // Filtros por precio
+  @@index([price_updated_at])          // Actualizaciones de precio
+  @@index([price_scraping_status])     // Estado del scraping
+  @@index([water_cooled, radiator_size]) // Combinado para AIO
+  @@index([height, fan_size])          // Combinado para air coolers
+
+  @@map("cpu_coolers")
+}
+
+
+model GPU {
+  id        String @id @default(cuid())
+  opendb_id String? @unique
+
+  // === METADATOS BÁSICOS ===
+  name             String
+  manufacturer     String?
+  series           String?
+  part_numbers     String[]
+  variant          String?
+  release_year     Int?
+
+  // === CAMPOS CRÍTICOS PARA COMPATIBILIDAD (PLANOS) ===
+  // Chipset - Crítico para identificación y compatibilidad
+  chipset_manufacturer String?    // NVIDIA, AMD, Intel
+  chipset              String?    // GeForce RTX 4090, Radeon RX 7900 XTX, etc.
+
+  // Interfaz - Crítico para compatibilidad con motherboard
+  interface            String?    // PCIe 4.0 x16, PCIe 5.0 x16
+
+  // Dimensiones - Críticas para compatibilidad con case
+  length               Int?       // En mm
+  case_expansion_slot_width Int?  // Número de slots que ocupa
+  total_slot_width     Int?       // Ancho total incluyendo cooler
+
+  // Potencia - Crítico para compatibilidad con PSU
+  tdp                  Int?       // En Watts
+  
+  // Conectores de alimentación - Críticos para PSU
+  power_6_pin          Int?       // Número de conectores 6-pin (75W c/u)
+  power_8_pin          Int?       // Número de conectores 8-pin (150W c/u)
+  power_12vhpwr        Int?       // Número de conectores 12VHPWR (600W)
+  power_12v_2x6        Int?       // Número de conectores 12V-2x6 (600W)
+
+  // === ESPECIFICACIONES DE RENDIMIENTO ===
+  // Memoria - Para filtros de rendimiento
+  memory               Int?       // VRAM en GB
+  memory_type          String?    // GDDR6X, GDDR6, etc.
+  memory_bus           Int?       // Ancho de bus en bits
+  effective_memory_clock Int?     // Clock efectivo en MHz
+
+  // Core - Para comparaciones de rendimiento
+  core_count           Int?       // Número de cores/shaders
+  core_base_clock      Int?       // Clock base en MHz
+  core_boost_clock     Int?       // Clock boost en MHz
+
+  // === CARACTERÍSTICAS ADICIONALES ===
+  // Cooling y estética
+  cooling              String?    // 3 Fans, 2 Fans, Blower, Water Cooled
+  color                String[]   // Colores disponibles
+  frame_sync           String?    // G-Sync, FreeSync, None
+
+  // Conectores de video - Para validación de monitores
+  hdmi_2_1             Int?       // Número de puertos HDMI 2.1
+  hdmi_2_0             Int?       // Número de puertos HDMI 2.0
+
+  // === INFORMACIÓN DE PRECIOS ===
+  best_price           Float?           // Mejor precio encontrado
+  best_price_url       String?          // URL del mejor precio
+  best_price_store     String?          // Tienda con mejor precio
+  price_updated_at     DateTime?        // Última actualización de precio
+  all_prices           Json?            // Todos los precios encontrados
+  price_scraping_status String?         // SUCCESS, FAILED, PENDING, NO_SKUS
+
+  // === JSON PARA DATOS COMPLEJOS (NO CRÍTICOS) ===
+  video_outputs        Json?      // Todos los outputs de video
+  power_connectors     Json?      // Configuración completa de conectores
+  retailer_skus        Json?      // SKUs de tiendas
+  raw_data            Json?       // Respaldo completo del JSON original
+
+  // === TIMESTAMPS ===
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // === ÍNDICES PARA COMPATIBILIDAD RÁPIDA ===
+  @@index([chipset_manufacturer])           // Filtros por fabricante de chipset
+  @@index([chipset])                        // Búsqueda por chipset específico
+  @@index([interface])                      // Compatibilidad con motherboard
+  @@index([length])                         // Compatibilidad con case
+  @@index([case_expansion_slot_width])      // Slots requeridos
+  @@index([tdp])                            // Compatibilidad con PSU
+  @@index([power_8_pin, power_6_pin])       // Conectores de alimentación
+  @@index([power_12vhpwr, power_12v_2x6])   // Conectores modernos
+  @@index([memory])                         // Filtros por VRAM
+  @@index([memory_type])                    // Tipo de memoria
+  @@index([core_boost_clock])               // Comparaciones de rendimiento
+  @@index([manufacturer, series])           // Búsquedas por marca/serie
+  @@index([best_price])                     // Filtros por precio
+  @@index([price_updated_at])               // Actualizaciones de precio
+  @@index([price_scraping_status])          // Estado del scraping
+  @@index([cooling])                        // Filtros por tipo de cooling
+  @@index([frame_sync])                     // Compatibilidad con monitores
+
+  @@map("gpus")
+}
+model Motherboard {
+  id        String @id @default(cuid())
+  opendb_id String? @unique
+
+  // === METADATOS BÁSICOS ===
+  name             String
+  manufacturer     String?
+  series           String?
+  part_numbers     String[]
+  variant          String?
+  release_year     Int?
+
+  // === CAMPOS CRÍTICOS PARA COMPATIBILIDAD (PLANOS) ===
+  // Socket - Crítico para compatibilidad con CPU
+  socket           String?    // LGA1151, AM4, AM5, LGA1700, etc.
+  
+  // Chipset - Crítico para funcionalidades y compatibilidad
+  chipset          String?    // Intel Z390, AMD X570, B550, etc.
+  
+  // Form Factor - Crítico para compatibilidad con case
+  form_factor      String?    // ATX, Micro ATX, Mini ITX, E-ATX
+  
+  // Memoria - Crítica para compatibilidad con RAM
+  memory_max       Int?       // Capacidad máxima en GB
+  memory_slots     Int?       // Número de slots de RAM
+  memory_type      String?    // DDR4, DDR5
+  
+  // PCIe Slots - Críticos para compatibilidad con GPU y expansión
+  pcie_x16_slots   Int?       // Slots PCIe x16 (principalmente GPU)
+  pcie_x8_slots    Int?       // Slots PCIe x8
+  pcie_x4_slots    Int?       // Slots PCIe x4
+  pcie_x1_slots    Int?       // Slots PCIe x1
+  pcie_gen         String?    // Generación PCIe dominante (3.0, 4.0, 5.0)
+  
+  // M.2 Slots - Críticos para almacenamiento NVMe
+  m2_slots_total   Int?       // Total de slots M.2
+  m2_slots_pcie    Int?       // M.2 con soporte PCIe
+  m2_slots_sata    Int?       // M.2 con soporte SATA
+  
+  // SATA - Para almacenamiento tradicional
+  sata_6gb_ports   Int?       // Puertos SATA 6Gb/s
+  sata_3gb_ports   Int?       // Puertos SATA 3Gb/s
+  
+  // USB Headers internos - Para conectividad frontal del case
+  usb_2_headers    Int?       // Headers USB 2.0
+  usb_3_gen1_headers Int?     // Headers USB 3.2 Gen 1
+  usb_3_gen2_headers Int?     // Headers USB 3.2 Gen 2
+  usb_c_headers    Int?       // Headers USB-C
+
+  // === CARACTERÍSTICAS IMPORTANTES ===
+  // Conectividad integrada
+  wifi_integrated  Boolean?   // WiFi integrado
+  bluetooth_integrated Boolean? // Bluetooth integrado
+  ethernet_speed   String?    // 1Gbps, 2.5Gbps, 10Gbps
+  
+  // Audio integrado
+  audio_chipset    String?    // Realtek ALC1220, etc.
+  audio_channels   String?    // 7.1-Channel, 5.1-Channel
+  
+  // Características especiales
+  ecc_support      Boolean?   // Soporte ECC
+  raid_support     Boolean?   // Soporte RAID
+  overclocking_support Boolean? // Soporte para overclocking
+  
+  // BIOS/UEFI Features
+  bios_flashback   Boolean?   // BIOS Flashback sin CPU
+  clear_cmos       Boolean?   // Botón Clear CMOS
+  dual_bios        Boolean?   // Dual BIOS
+  
+  // Estética y conectores especiales
+  color            String[]   // Colores disponibles
+  rgb_lighting     Boolean?   // Iluminación RGB
+  back_connect     Boolean?   // Conectores traseros (back-connect)
+  
+  // === INFORMACIÓN DE PRECIOS ===
+  best_price        Float?           // Mejor precio encontrado
+  best_price_url    String?          // URL del mejor precio
+  best_price_store  String?          // Tienda con mejor precio
+  price_updated_at  DateTime?        // Última actualización de precio
+  all_prices        Json?            // Todos los precios encontrados
+  price_scraping_status String?      // SUCCESS, FAILED, PENDING, NO_SKUS
+
+  // === JSON PARA DATOS COMPLEJOS (NO CRÍTICOS) ===
+  pcie_slots_detailed Json?    // Configuración detallada de PCIe
+  m2_slots_detailed   Json?    // Configuración detallada de M.2
+  back_panel_ports    Json?    // Puertos del panel trasero
+  usb_headers_detailed Json?   // Headers USB detallados
+  storage_detailed    Json?    // Configuración de almacenamiento
+  onboard_ethernet    Json?    // Controladores Ethernet
+  bios_features       Json?    // Características BIOS completas
+  retailer_skus       Json?    // SKUs de tiendas
+  raw_data           Json?     // Respaldo completo del JSON original
+
+  // === TIMESTAMPS ===
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // === ÍNDICES PARA COMPATIBILIDAD RÁPIDA ===
+  @@index([socket])                     // Compatibilidad con CPU
+  @@index([chipset])                    // Búsqueda por chipset
+  @@index([form_factor])                // Compatibilidad con case
+  @@index([memory_type])                // Compatibilidad con RAM
+  @@index([memory_slots])               // Capacidad de memoria
+  @@index([pcie_x16_slots])             // Compatibilidad con GPU
+  @@index([pcie_gen])                   // Generación PCIe
+  @@index([m2_slots_total])             // Slots M.2 disponibles
+  @@index([sata_6gb_ports])             // Puertos SATA
+  @@index([wifi_integrated])            // WiFi integrado
+  @@index([manufacturer, series])       // Búsquedas por marca/serie
+  @@index([overclocking_support])       // Soporte overclock
+  @@index([ecc_support])                // Soporte ECC
+  @@index([best_price])                 // Filtros por precio
+  @@index([price_updated_at])           // Actualizaciones de precio
+  @@index([price_scraping_status])      // Estado del scraping
+  @@index([socket, form_factor])        // Combinado CPU + case
+  @@index([memory_type, memory_slots])  // Combinado memoria
+  @@index([pcie_x16_slots, pcie_gen])   // Combinado GPU
+
+  @@map("motherboards")
+}
+
+model PCCase {
+  id        String @id @default(cuid())
+  opendb_id String? @unique
+
+  // === METADATOS BÁSICOS ===
+  name             String
+  manufacturer     String?
+  series           String?
+  part_numbers     String[]
+  variant          String?
+  release_year     Int?
+
+  // === CAMPOS CRÍTICOS PARA COMPATIBILIDAD (PLANOS) ===
+  // Form Factor - Crítico para compatibilidad con motherboard
+  form_factor      String?    // ATX Mid Tower, Mini ITX, Full Tower, etc.
+  
+  // Motherboard Support - Compatibilidad específica
+  supports_atx     Boolean?   // Soporta ATX
+  supports_matx    Boolean?   // Soporta Micro ATX
+  supports_mitx    Boolean?   // Soporta Mini ITX
+  supports_eatx    Boolean?   // Soporta E-ATX
+  
+  // GPU Clearance - Crítico para compatibilidad con GPU
+  max_gpu_length   Int?       // Longitud máxima de GPU en mm
+  
+  // CPU Cooler Clearance - Crítico para compatibilidad con coolers
+  max_cpu_cooler_height Int?  // Altura máxima de CPU cooler en mm
+  
+  // PSU Support - Crítico para compatibilidad con fuente de poder
+  psu_included     Boolean?   // Si incluye PSU
+  psu_form_factors String[]   // ATX, SFX, SFX-L soportados
+  max_psu_length   Int?       // Longitud máxima de PSU en mm
+  
+  // Expansion Slots - Para GPUs y tarjetas de expansión
+  expansion_slots  Int?       // Número de slots de expansión (7, 8, etc.)
+  
+  // Storage Bays - Para capacidad de almacenamiento
+  drive_bays_3_5   Int?       // Bahías para HDDs de 3.5"
+  drive_bays_2_5   Int?       // Bahías para SSDs de 2.5"
+  drive_bays_5_25  Int?       // Bahías para unidades ópticas (5.25")
+
+  // === CARACTERÍSTICAS IMPORTANTES ===
+  // Dimensiones físicas - Para espacio disponible
+  length           Int?       // Profundidad en mm
+  width            Int?       // Ancho en mm  
+  height           Int?       // Alto en mm
+  volume           Float?     // Volumen en litros
+  weight           Float?     // Peso en kg
+  
+  // Estética y paneles
+  side_panel_type  String?    // Tempered Glass, Acrylic, Steel, Mesh
+  has_tempered_glass Boolean? // Panel de vidrio templado
+  color            String[]   // Colores disponibles
+  
+  // Conectividad frontal - Para comodidad del usuario
+  front_usb_2_0    Int?       // Puertos USB 2.0 frontales
+  front_usb_3_0    Int?       // Puertos USB 3.0 frontales
+  front_usb_3_1    Int?       // Puertos USB 3.1 frontales
+  front_usb_3_2    Int?       // Puertos USB 3.2 frontales
+  front_usb_c      Int?       // Puertos USB-C frontales
+  front_audio_ports Int?      // Puertos de audio frontales
+  
+  // Ventilación y cooling - Para rendimiento térmico
+  fan_mounts_120mm Int?       // Montajes para ventiladores 120mm
+  fan_mounts_140mm Int?       // Montajes para ventiladores 140mm
+  radiator_support_240mm Boolean? // Soporte radiador 240mm
+  radiator_support_280mm Boolean? // Soporte radiador 280mm
+  radiator_support_360mm Boolean? // Soporte radiador 360mm
+  
+  // Características adicionales
+  dust_filters     Boolean?   // Filtros de polvo
+  tool_free_installation Boolean? // Instalación sin herramientas
+  cable_management Boolean?   // Gestión de cables
+  rgb_lighting     Boolean?   // Iluminación RGB integrada
+
+  // === INFORMACIÓN DE PRECIOS ===
+  best_price        Float?           // Mejor precio encontrado
+  best_price_url    String?          // URL del mejor precio
+  best_price_store  String?          // Tienda con mejor precio
+  price_updated_at  DateTime?        // Última actualización de precio
+  all_prices        Json?            // Todos los precios encontrados
+  price_scraping_status String?      // SUCCESS, FAILED, PENDING, NO_SKUS
+
+  // === JSON PARA DATOS COMPLEJOS (NO CRÍTICOS) ===
+  dimensions_detailed Json?    // Dimensiones completas y detalladas
+  front_panel_detailed Json?   // Conectividad frontal detallada
+  cooling_support     Json?    // Soporte completo de cooling
+  motherboard_support Json?    // Soporte detallado de motherboards
+  retailer_skus       Json?    // SKUs de tiendas
+  raw_data           Json?     // Respaldo completo del JSON original
+
+  // === TIMESTAMPS ===
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // === ÍNDICES PARA COMPATIBILIDAD RÁPIDA ===
+  @@index([form_factor])                // Tipo de case
+  @@index([supports_atx])               // Soporte ATX
+  @@index([supports_matx])              // Soporte Micro ATX
+  @@index([supports_mitx])              // Soporte Mini ITX
+  @@index([max_gpu_length])             // Clearance GPU
+  @@index([max_cpu_cooler_height])      // Clearance CPU cooler
+  @@index([expansion_slots])            // Slots de expansión
+  @@index([drive_bays_3_5])             // Bahías HDD
+  @@index([drive_bays_2_5])             // Bahías SSD
+  @@index([psu_form_factors])           // Compatibilidad PSU
+  @@index([has_tempered_glass])         // Panel de vidrio
+  @@index([manufacturer, series])       // Búsquedas por marca/serie
+  @@index([color])                      // Filtros por color
+  @@index([volume])                     // Filtros por tamaño
+  @@index([radiator_support_240mm])     // Soporte AIO 240mm
+  @@index([radiator_support_360mm])     // Soporte AIO 360mm
+  @@index([best_price])                 // Filtros por precio
+  @@index([price_updated_at])           // Actualizaciones de precio
+  @@index([price_scraping_status])      // Estado del scraping
+  @@index([form_factor, max_gpu_length]) // Combinado para GPU
+  @@index([supports_atx, max_cpu_cooler_height]) // Combinado ATX + cooler
+
+  @@map("pc_cases")
+}
+
+model PSU {
+  id        String @id @default(cuid())
+  opendb_id String? @unique
+
+  // === METADATOS BÁSICOS ===
+  name             String
+  manufacturer     String?
+  series           String?
+  part_numbers     String[]
+  variant          String?
+  release_year     Int?
+
+  // === CAMPOS CRÍTICOS PARA COMPATIBILIDAD (PLANOS) ===
+  // Potencia - Crítico para compatibilidad con componentes
+  wattage          Int?       // Potencia en Watts
+  
+  // Form Factor - Crítico para compatibilidad con case
+  form_factor      String?    // ATX, SFX, SFX-L, TFX
+  
+  // Dimensiones - Para compatibilidad física con case
+  length           Int?       // Profundidad en mm
+  width            Int?       // Ancho en mm (importante para SFX)
+  height           Int?       // Alto en mm
+  
+  // Conectores principales - Críticos para compatibilidad
+  connector_atx_24pin     Int?    // Conector principal motherboard
+  connector_eps_8pin      Int?    // Conectores CPU (8-pin)
+  connector_eps_4pin      Int?    // Conectores CPU (4-pin)
+  
+  // Conectores GPU - Críticos para compatibilidad con GPU
+  connector_pcie_8pin     Int?    // PCIe 8-pin (150W cada uno)
+  connector_pcie_6pin     Int?    // PCIe 6-pin (75W cada uno)
+  connector_pcie_6plus2   Int?    // PCIe 6+2 pin (150W cada uno)
+  connector_pcie_12vhpwr  Int?    // Conectores 12VHPWR nuevos (600W)
+  connector_pcie_12v_2x6  Int?    // Conectores 12V-2x6 (600W)
+  
+  // Conectores almacenamiento - Para drives
+  connector_sata          Int?    // Conectores SATA
+  connector_molex_4pin    Int?    // Conectores Molex 4-pin
+  connector_floppy_4pin   Int?    // Conectores Floppy (legacy)
+
+  // === CARACTERÍSTICAS IMPORTANTES ===
+  // Eficiencia - Importante para consumo eléctrico
+  efficiency_rating String?     // 80+ Bronze, Gold, Platinum, Titanium
+  efficiency_percent Float?     // Porcentaje de eficiencia
+  
+  // Modularidad - Para gestión de cables
+  modular_type     String?      // Non-Modular, Semi-Modular, Fully Modular
+  
+  // Características térmicas y ruido
+  fanless          Boolean?     // PSU pasivo (sin ventilador)
+  fan_size         Int?         // Tamaño del ventilador en mm
+  operating_temp_max Int?       // Temperatura máxima de operación
+  
+  // Protecciones y calidad
+  ocp_protection   Boolean?     // Over Current Protection
+  ovp_protection   Boolean?     // Over Voltage Protection
+  opp_protection   Boolean?     // Over Power Protection
+  scp_protection   Boolean?     // Short Circuit Protection
+  
+  // Rails de potencia - Para distribución de energía
+  rail_12v_amps    Float?       // Amperaje en rail +12V
+  rail_5v_amps     Float?       // Amperaje en rail +5V
+  rail_3_3v_amps   Float?       // Amperaje en rail +3.3V
+  
+  // Estética
+  color            String[]     // Colores disponibles
+  rgb_lighting     Boolean?     // Iluminación RGB
+  
+  // Certificaciones
+  certifications   String[]     // CE, FCC, UL, etc.
+
+  // === INFORMACIÓN DE PRECIOS ===
+  best_price        Float?           // Mejor precio encontrado
+  best_price_url    String?          // URL del mejor precio
+  best_price_store  String?          // Tienda con mejor precio
+  price_updated_at  DateTime?        // Última actualización de precio
+  all_prices        Json?            // Todos los precios encontrados
+  price_scraping_status String?      // SUCCESS, FAILED, PENDING, NO_SKUS
+
+  // === JSON PARA DATOS COMPLEJOS (NO CRÍTICOS) ===
+  connectors_detailed Json?     // Configuración detallada de conectores
+  power_rails        Json?      // Información completa de rails
+  protections        Json?      // Protecciones completas
+  dimensions_detailed Json?     // Dimensiones completas
+  retailer_skus      Json?      // SKUs de tiendas
+  raw_data          Json?       // Respaldo completo del JSON original
+
+  // === TIMESTAMPS ===
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // === ÍNDICES PARA COMPATIBILIDAD RÁPIDA ===
+  @@index([wattage])                        // Filtros por potencia
+  @@index([form_factor])                    // Compatibilidad con case
+  @@index([length])                         // Clearance en case
+  @@index([connector_atx_24pin])            // Conector principal
+  @@index([connector_eps_8pin])             // Conectores CPU
+  @@index([connector_pcie_8pin])            // Conectores GPU 8-pin
+  @@index([connector_pcie_6plus2])          // Conectores GPU 6+2
+  @@index([connector_pcie_12vhpwr])         // Conectores GPU modernos
+  @@index([connector_sata])                 // Conectores almacenamiento
+  @@index([efficiency_rating])              // Filtros por eficiencia
+  @@index([modular_type])                   // Tipo de modularidad
+  @@index([fanless])                        // PSUs silenciosos
+  @@index([manufacturer, series])           // Búsquedas por marca/serie
+  @@index([best_price])                     // Filtros por precio
+  @@index([price_updated_at])               // Actualizaciones de precio
+  @@index([price_scraping_status])          // Estado del scraping
+  @@index([wattage, form_factor])           // Combinado potencia + forma
+  @@index([wattage, efficiency_rating])     // Combinado potencia + eficiencia
+  @@index([connector_pcie_8pin, connector_pcie_6plus2]) // GPU combinado
+
+  @@map("psus")
+}
+
+model RAM {
+  id        String @id @default(cuid())
+  opendb_id String? @unique
+
+  // === METADATOS BÁSICOS ===
+  name             String
+  manufacturer     String?
+  series           String?
+  part_numbers     String[]
+  variant          String?
+  release_year     Int?
+
+  // === CAMPOS CRÍTICOS PARA COMPATIBILIDAD (PLANOS) ===
+  // Tipo de memoria - Crítico para compatibilidad con motherboard
+  ram_type         String?    // DDR4, DDR5
+  
+  // Form Factor - Crítico para compatibilidad física
+  form_factor      String?    // 288-pin DIMM (DDR4), 288-pin DIMM (DDR5), SO-DIMM
+  
+  // Configuración del kit - Crítica para planificación
+  modules_quantity Int?       // Número de módulos en el kit (1, 2, 4, 8)
+  module_capacity  Int?       // Capacidad por módulo en GB
+  total_capacity   Int?       // Capacidad total del kit en GB
+  
+  // Velocidad - Crítica para rendimiento
+  speed_mhz        Int?       // Velocidad en MHz (3200, 3600, 6400, etc.)
+  
+  // Timings - Importantes para rendimiento
+  cas_latency      Int?       // CAS Latency (CL)
+  timing_trcd      Int?       // tRCD timing
+  timing_trp       Int?       // tRP timing  
+  timing_tras      Int?       // tRAS timing
+  
+  // Voltaje - Para compatibilidad y overclocking
+  voltage          Float?     // Voltaje en V (1.35, 1.5, etc.)
+  
+  // Características especiales - Para compatibilidad específica
+  ecc_support      Boolean?   // true para ECC, false para Non-ECC
+  registered       Boolean?   // true para Registered/Buffered, false para Unbuffered
+  
+  // === CARACTERÍSTICAS IMPORTANTES ===
+  // Estética y cooling
+  heat_spreader    Boolean?   // Disipadores de calor
+  rgb_lighting     Boolean?   // Iluminación RGB
+  color            String[]   // Colores disponibles
+  
+  // Perfiles de overclocking
+  xmp_profile      Boolean?   // Intel XMP support
+  docp_profile     Boolean?   // AMD DOCP support
+  expo_profile     Boolean?   // AMD EXPO support (DDR5)
+  jedec_standard   Boolean?   // Soporte JEDEC estándar
+  
+  // Altura - Para compatibilidad con CPU coolers
+  height_mm        Int?       // Altura en mm (importante para clearance)
+  
+  // Garantía y calidad
+  warranty_years   Int?       // Años de garantía
+  lifetime_warranty Boolean?  // Garantía de por vida
+
+  // === INFORMACIÓN DE PRECIOS ===
+  best_price        Float?           // Mejor precio encontrado
+  best_price_url    String?          // URL del mejor precio
+  best_price_store  String?          // Tienda con mejor precio
+  price_updated_at  DateTime?        // Última actualización de precio
+  all_prices        Json?            // Todos los precios encontrados
+  price_scraping_status String?      // SUCCESS, FAILED, PENDING, NO_SKUS
+
+  // === JSON PARA DATOS COMPLEJOS (NO CRÍTICOS) ===
+  timings_detailed  Json?     // Timings completos y secundarios
+  overclocking_profiles Json? // Perfiles XMP/DOCP/EXPO completos
+  test_results      Json?     // Resultados de benchmarks si disponibles
+  retailer_skus     Json?     // SKUs de tiendas
+  raw_data         Json?      // Respaldo completo del JSON original
+
+  // === TIMESTAMPS ===
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // === ÍNDICES PARA COMPATIBILIDAD RÁPIDA ===
+  @@index([ram_type])                       // Compatibilidad DDR4/DDR5
+  @@index([form_factor])                    // DIMM vs SO-DIMM
+  @@index([total_capacity])                 // Filtros por capacidad
+  @@index([modules_quantity])               // Configuración del kit
+  @@index([speed_mhz])                      // Velocidad de memoria
+  @@index([cas_latency])                    // Latencia para rendimiento
+  @@index([ecc_support])                    // ECC vs Non-ECC
+  @@index([registered])                     // Registered vs Unbuffered
+  @@index([voltage])                        // Voltaje para compatibilidad
+  @@index([rgb_lighting])                   // Filtros estéticos
+  @@index([xmp_profile])                    // Soporte overclocking Intel
+  @@index([docp_profile])                   // Soporte overclocking AMD
+  @@index([expo_profile])                   // Soporte EXPO DDR5
+  @@index([height_mm])                      // Clearance con coolers
+  @@index([manufacturer, series])           // Búsquedas por marca/serie
+  @@index([best_price])                     // Filtros por precio
+  @@index([price_updated_at])               // Actualizaciones de precio
+  @@index([price_scraping_status])          // Estado del scraping
+  @@index([ram_type, speed_mhz])            // Combinado tipo + velocidad
+  @@index([total_capacity, modules_quantity]) // Combinado capacidad + configuración
+  @@index([speed_mhz, cas_latency])         // Combinado velocidad + latencia
+  @@index([ecc_support, registered])        // Combinado para servidores/workstations
+
+  @@map("ram_modules")
+}
+
+model Storage {
+  id        String @id @default(cuid())
+  opendb_id String? @unique
+
+  // === METADATOS BÁSICOS ===
+  name             String
+  manufacturer     String?
+  series           String?
+  part_numbers     String[]
+  variant          String?
+  release_year     Int?
+
+  // === CAMPOS CRÍTICOS PARA COMPATIBILIDAD (PLANOS) ===
+  // Capacidad - Crítico para filtros de almacenamiento
+  capacity_gb      Int?       // Capacidad en GB para comparaciones numéricas
+  capacity_tb      Float?     // Capacidad en TB para displays (calculado: capacity_gb / 1000)
+
+  // Tipo de almacenamiento - Crítico para compatibilidad y rendimiento
+  storage_type     String?    // HDD, SSD, NVME_SSD, HYBRID
+  is_nvme          Boolean?   // true para NVMe, false para SATA SSD/HDD
+  is_ssd           Boolean?   // true para cualquier SSD (SATA o NVMe)
+
+  // Form factor - Crítico para compatibilidad física con case
+  form_factor      String?    // 3.5", 2.5", M.2 2280, M.2 2242, etc.
+  
+  // Interface - Crítico para compatibilidad con motherboard
+  interface        String?    // SATA 6.0 Gb/s, PCIe 3.0 x4, PCIe 4.0 x4, etc.
+  interface_type   String?    // SATA, PCIE, M2 (normalizado del interface)
+  interface_version String?   // 6.0 Gb/s, 3.0, 4.0 (extraído del interface)
+
+  // RPM - Para HDDs, crítico para rendimiento
+  rpm              Int?       // 5400, 7200, 10000, etc. (null para SSDs)
+
+  // Velocidades - Críticas para comparaciones de rendimiento
+  read_speed_mbps  Int?       // Velocidad de lectura en MB/s
+  write_speed_mbps Int?       // Velocidad de escritura en MB/s
+
+  // Cache - Para especificaciones de rendimiento (principalmente HDDs)
+  cache_mb         Int?       // Cache en MB
+
+  // Durabilidad - Importante para SSDs
+  tbw              Int?       // Total Bytes Written (TB) - solo SSDs
+  mtbf_hours       Int?       // Mean Time Between Failures en horas
+
+  // Consumo - Para compatibilidad con PSU
+  power_consumption_watts Float? // Consumo en Watts
+
+  // === INFORMACIÓN DE PRECIOS ===
+  best_price        Float?           // Mejor precio encontrado
+  best_price_url    String?          // URL del mejor precio
+  best_price_store  String?          // Tienda con mejor precio
+  price_updated_at  DateTime?        // Última actualización de precio
+  all_prices        Json?            // Todos los precios encontrados
+  price_scraping_status String?      // SUCCESS, FAILED, PENDING, NO_SKUS
+
+  // === JSON PARA DATOS COMPLEJOS (NO CRÍTICOS) ===
+  retailer_skus     Json?     // SKUs de tiendas (amazon_sku, etc.)
+  raw_data          Json?     // Respaldo completo del JSON original
+
+  // === TIMESTAMPS ===
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // === ÍNDICES PARA COMPATIBILIDAD RÁPIDA ===
+  @@index([storage_type])              // Filtros por tipo (HDD/SSD/NVMe)
+  @@index([form_factor])               // Compatibilidad física con case
+  @@index([interface_type])            // Compatibilidad con motherboard
+  @@index([capacity_gb])               // Filtros de capacidad
+  @@index([is_nvme])                   // Filtros NVMe específicos
+  @@index([is_ssd])                    // Filtros SSD vs HDD
+  @@index([manufacturer, series])       // Búsquedas por marca/serie
+  @@index([rpm])                       // Filtros de RPM para HDDs
+  @@index([read_speed_mbps])           // Comparaciones de velocidad
+  @@index([write_speed_mbps])          // Comparaciones de velocidad
+  @@index([capacity_gb, storage_type]) // Filtros combinados
+  @@index([best_price])                // Filtros por precio
+  @@index([price_updated_at])          // Actualizaciones de precio
+  @@index([price_scraping_status])     // Estado del scraping
+
+  @@map("storage")
+}

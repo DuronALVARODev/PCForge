@@ -1,0 +1,39 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: JAPD040508.
+      POSTGRES_DB: PCForge,
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://postgres:JAPD040508.@db:5432/PCForge
+      - JWT_SECRET=SECRETOSEGURO
+      - JWT_REFRESH_SECRET=OTROSECRETOSEGURO
+      - FRONTEND_URL=http://localhost:3000
+      - NEXT_PUBLIC_API_URL=http://localhost:3000
+      - EMAIL_USER=pcforge8@gmail.com
+      - EMAIL_PASS=jusahjzkslejpqpf
+    ports:
+      - "4000:4000"
+    restart: always
+    working_dir: /app
+    command: sh -c "npx prisma generate && npx prisma migrate deploy && node src/server.js"
+
+volumes:
+  pgdata:

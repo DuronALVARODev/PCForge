@@ -1,0 +1,83 @@
+# Documentación del Servicio RESTful de CPUs (`/api/cpus`)
+
+## Descripción General
+El endpoint `/api/cpus` expone un servicio RESTful que permite obtener la lista de procesadores (CPUs) disponibles en la base de datos de PCForge. Este servicio es utilizado por el frontend para mostrar y filtrar CPUs en el configurador de PC.
+
+## Ubicación del Código
+- **Ruta del endpoint:** `backend/src/routes/cpu.routes.js`
+- **Controlador:** `backend/src/controllers/cpu.controller.js`
+- **Servicio:** `backend/src/services/cpu.service.js`
+- **Frontend (consumo):** `frontend/src/app/pc-build/page.tsx`
+
+## Seguridad y Validación
+- El endpoint es de solo lectura (GET) y no requiere autenticación para consultar CPUs.
+- La validación y sanitización de datos se realiza en el backend antes de exponer los datos al frontend.
+- El backend filtra y transforma los datos para exponer solo la información relevante y segura.
+
+## Ejemplo de Consumo (Frontend)
+En `frontend/src/app/pc-build/page.tsx`:
+```tsx
+useEffect(() => {
+  setLoadingCpus(true);
+  setErrorCpus(null);
+  fetch("/api/cpus")
+    .then(async (res) => {
+      if (!res.ok) throw new Error("Error al obtener CPUs");
+      const data = await res.json();
+      // Mapear los datos de la API al formato Component
+      const cpus: Component[] = data.map((cpu: any) => ({
+        id: cpu.id,
+        name: cpu.name,
+        brand: cpu.manufacturer || "",
+        price: cpu.best_price !== undefined && cpu.best_price !== null ? cpu.best_price : (cpu.raw_data?.price || cpu.tdp || 0),
+        best_price: cpu.best_price !== undefined && cpu.best_price !== null ? cpu.best_price : undefined,
+        image: "/placeholder.svg?height=80&width=80",
+        specs: {
+          Núcleos: cpu.cores_total?.toString() || "-",
+          Hilos: cpu.cores_threads?.toString() || "-",
+          "Frecuencia Base": cpu.clock_base ? `${cpu.clock_base} GHz` : "-",
+          Socket: cpu.socket || "-",
+          TDP: cpu.tdp ? `${cpu.tdp}W` : "-",
+        },
+        compatibility: {
+          socket: cpu.socket,
+          powerRequirement: cpu.tdp || undefined,
+        },
+      }));
+      setCpus(cpus);
+      setLoadingCpus(false);
+    })
+    .catch((err) => {
+      setErrorCpus(err.message);
+      setLoadingCpus(false);
+    });
+}, []);
+```
+
+## Ejemplo de Respuesta
+```json
+[
+  {
+    "id": "cpu_1",
+    "name": "Intel Core i7-12700K",
+    "manufacturer": "Intel",
+    "cores_total": 12,
+    "cores_threads": 20,
+    "clock_base": 3.6,
+    "socket": "LGA1700",
+    "tdp": 125,
+    "best_price": 350.99,
+    "raw_data": { ... }
+  },
+  ...
+]
+```
+
+## Prácticas de Seguridad
+- El endpoint solo expone información pública y no sensible.
+- No se exponen datos internos ni credenciales.
+- El backend controla el formato y los campos expuestos.
+- Se recomienda consumir el endpoint siempre desde HTTPS.
+
+## Justificación
+Este endpoint sigue los principios REST, es seguro, y está documentado para facilitar su revisión académica/profesional. El código está comentado y la lógica de transformación de datos es transparente y auditable.

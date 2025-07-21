@@ -1,0 +1,114 @@
+# Propuesta de Servicio Web Propio (API REST)
+
+## Tipo de Servicio Web
+- **Tipo:** REST (Representational State Transfer)
+- **Formato de datos:** JSON
+- **Protocolo:** HTTP
+
+## Descripción General
+El servicio web expone información de componentes de hardware (por ejemplo, CPUs) almacenados en una base de datos PostgreSQL. Permite que otras aplicaciones (web, móviles, etc.) consuman estos datos de manera sencilla y estandarizada.
+
+## Endpoints Propuestos
+
+### 1. Obtener todos los CPUs
+- **Método:** GET
+- **Ruta:** `/api/cpus`
+- **Descripción:** Devuelve un listado de todos los CPUs registrados en la base de datos.
+- **Respuesta de ejemplo:**
+```json
+[
+  {
+    "id": "ckz...",
+    "name": "Intel Core i7-12700K",
+    "manufacturer": "Intel",
+    "cores_total": 12,
+    "cores_threads": 20,
+    "clock_base": 3.6,
+    "socket": "LGA1700",
+    "tdp": 125,
+    "best_price": 4999.99,
+    "best_price_url": "https://ejemplo.com/cpu/12700k",
+    "created_at": "2025-07-09T12:00:00.000Z"
+  },
+  ...
+]
+```
+
+### 2. Obtener un CPU por ID
+- **Método:** GET
+- **Ruta:** `/api/cpus/:id`
+- **Descripción:** Devuelve los detalles de un CPU específico.
+
+### 3. Crear un nuevo CPU (opcional, para administración)
+- **Método:** POST
+- **Ruta:** `/api/cpus`
+- **Descripción:** Permite agregar un nuevo CPU a la base de datos.
+- **Cuerpo esperado:**
+```json
+{
+  "name": "AMD Ryzen 7 5800X",
+  "manufacturer": "AMD",
+  ...
+}
+```
+
+## Justificación de REST
+- Es el estándar más usado para aplicaciones web modernas.
+- Es fácil de consumir desde cualquier lenguaje o plataforma.
+- Permite escalabilidad y separación clara entre frontend y backend.
+
+## Ejemplo de Consumo
+Una aplicación móvil o web puede hacer una petición HTTP GET a `https://tudominio.com/api/cpus` y obtener el listado de CPUs en formato JSON para mostrarlo en su interfaz.
+
+## Archivos y Funciones Clave en la Implementación
+- **backend/src/routes/cpu.routes.js**: Define la ruta `/api/cpus`.
+- **backend/src/controllers/cpu.controller.js**: Controlador que responde con los datos en JSON.
+- **backend/src/services/cpu.service.js**: Lógica para obtener los datos desde la base de datos.
+- **backend/src/server.js**: Monta la ruta en el servidor Express.
+- **frontend/src/app/pc-build/page.tsx**: Ejemplo de consumo del API desde el frontend usando fetch.
+
+---
+
+## Implementación técnica del servicio web REST de CPUs
+
+A continuación se muestran los archivos y bloques de código clave que implementan el endpoint REST `/api/cpus` para devolver la lista de CPUs:
+
+### 1. Definición de la ruta
+- **Archivo:** `backend/src/routes/cpu.routes.js`
+```js
+// GET /api/cpus
+router.get('/', cpuController.getAllCPUs);
+```
+
+### 2. Controlador del recurso
+- **Archivo:** `backend/src/controllers/cpu.controller.js`
+```js
+exports.getAllCPUs = async (req, res) => {
+  try {
+    const cpus = await cpuService.getAllCPUs();
+    res.json(cpus);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener CPUs', details: error.message });
+  }
+};
+```
+
+### 3. Servicio de acceso a datos
+- **Archivo:** `backend/src/services/cpu.service.js`
+```js
+async function getAllCPUs() {
+  return prisma.cPU.findMany();
+}
+```
+
+### 4. Integración en el servidor
+- **Archivo:** `backend/src/server.js`
+```js
+app.use("/api/cpus", cpuRoutes);
+```
+
+Este endpoint RESTful (`GET /api/cpus`) devuelve la lista de CPUs en formato JSON y puede ser consumido por cualquier cliente HTTP.
+
+---
+
+Este servicio web REST puede ser consumido por cualquier otra aplicación que soporte HTTP y JSON, cumpliendo así con el requerimiento de interoperabilidad y reutilización de servicios.
