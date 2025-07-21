@@ -80,12 +80,7 @@ const TrashIcon = () => (
   </svg>
 )
 
-const UserIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-    <circle cx="12" cy="7" r="4" />
-  </svg>
-)
+// ...existing code...
 
 const categories = [
   { id: "cpu" as ComponentCategory, name: "Procesador", icon: CpuIcon },
@@ -256,7 +251,7 @@ const PCConfigurator = () => {
   const [currentBuild, setCurrentBuild] = useState<PCBuild>(initialBuild)
   const [searchTerm, setSearchTerm] = useState("")
   const [brandFilter, setBrandFilter] = useState<string[]>([])
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen] = useState(true)
 
   // Estado para CPUs desde la base de datos
   const [cpus, setCpus] = useState<Component[]>([]);
@@ -293,7 +288,7 @@ const PCConfigurator = () => {
           },
         }));
         setCpus(cpus);
-      } catch (err) {
+      } catch {
         // Si quieres mostrar un mensaje de error, puedes agregar un estado local aquí
       } finally {
         setLoadingCpus(false);
@@ -465,7 +460,7 @@ const PCConfigurator = () => {
                       </button>
                     </div>
                   )}
-                  {!loadingCpus && paginatedComponents.map((component) => {
+                  {!loadingCpus && paginatedComponents.map((component: Component) => {
                     const isSelected = currentBuild[selectedCategory]?.id === component.id;
                     const compatibility = checkCompatibility(component, selectedCategory, currentBuild);
                     const bestPrice = component.best_price !== undefined ? component.best_price : component.price;
