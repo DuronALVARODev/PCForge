@@ -60,16 +60,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const login = async (credentials: LoginCredentials) => {
     try {
-      // Hacer login
-      const loginRes = await axios.post(`${API_BASE_URL}/login`, credentials, {
+      await axios.post(`${API_BASE_URL}/login`, credentials, {
         withCredentials: true,
       });
-
-      // Obtener datos del usuario después del login
       const userRes = await axios.get(`${API_BASE_URL}/me`, { withCredentials: true });
       setUser(userRes.data);
-
-      // Redirigir según el rol
       const role = userRes.data.role;
       if (role === "admin" || role === "superadmin") {
         router.push("/admin");

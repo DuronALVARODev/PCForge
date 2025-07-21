@@ -15,6 +15,7 @@ const Footer = () => {
           {/* Brand Section */}
           <div className="footer-brand">
             <div className="brand-logo">
+              {/* TODO: Cambiar por <Image /> de next/image para optimización */}
               <img 
                 src="/images/Logo.png" 
                 alt="Logo" 

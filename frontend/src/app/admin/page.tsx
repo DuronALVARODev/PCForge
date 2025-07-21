@@ -13,7 +13,6 @@ const AdminPage = () => {
       try {
         const res = await fetch("/api/auth/me", { credentials: "include" });
         if (!res.ok) {
-          // Si la sesión no existe, ir a login
           router.replace("/login");
           return;
         }
@@ -21,26 +20,14 @@ const AdminPage = () => {
         if (data.role === "admin" || data.role === "superadmin") {
           setRole(data.role);
         } else {
-          // Si hay sesión pero no es admin, ir a perfil
           router.replace("/profile");
         }
-      } catch (error) {
-        // Si el error es 401, ir a login. Si es otro, ir a perfil.
-        try {
-          const res = await fetch("/api/auth/me", { credentials: "include" });
-          if (res.status === 401) {
-            router.replace("/login");
-          } else {
-            router.replace("/profile");
-          }
-        } catch (err) {
-          router.replace("/profile");
-        }
+      } catch {
+        router.replace("/profile");
       } finally {
         setLoading(false);
       }
     };
-
     checkAdminAccess();
   }, [router]);
 

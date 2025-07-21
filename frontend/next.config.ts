@@ -5,19 +5,19 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/cpus',
-        destination: 'http://localhost:4000/api/cpus',
+        destination: 'https://pcforge-backend.onrender.com/api/cpus',
       },
       {
         source: '/api/auth/:path*',
-        destination: 'http://localhost:4000/api/auth/:path*',
+        destination: 'https://pcforge-backend.onrender.com/api/auth/:path*',
       },
       {
         source: '/api/admin/:path*',
-        destination: 'http://localhost:4000/api/admin/:path*',
+        destination: 'https://pcforge-backend.onrender.com/api/admin/:path*',
       },
       {
         source: '/api/images/:path*',
-        destination: 'http://localhost:4000/images/:path*',
+        destination: 'https://pcforge-backend.onrender.com/images/:path*',
       },
       // Puedes agregar más endpoints aquí si lo necesitas
     ];

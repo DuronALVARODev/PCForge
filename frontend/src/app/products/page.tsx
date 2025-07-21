@@ -199,6 +199,7 @@ const ComponentCarousel: React.FC<ComponentCarouselProps> = ({ category, compone
             <div key={component.id} className="component-card">
               <div className="component-image">
                 <img src={component.image} alt={component.name} />
+              {/* TODO: Cambiar por <Image /> de next/image para optimización */}
                 
               </div>
               <div className="component-info">

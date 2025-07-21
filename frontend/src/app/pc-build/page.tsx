@@ -261,7 +261,6 @@ const PCConfigurator = () => {
   // Estado para CPUs desde la base de datos
   const [cpus, setCpus] = useState<Component[]>([]);
   const [loadingCpus, setLoadingCpus] = useState(false);
-  const [errorCpus, setErrorCpus] = useState<string | null>(null);
 
   // Estado para paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -270,17 +269,15 @@ const PCConfigurator = () => {
   useEffect(() => {
     const fetchCpus = async () => {
       setLoadingCpus(true);
-      setErrorCpus(null);
       try {
         const res = await fetch("/api/cpus");
         if (!res.ok) throw new Error("Error al obtener CPUs");
         const data = await res.json();
-        // Mapear los datos de la API al formato Component
         const cpus: Component[] = data.map((cpu: any) => ({
           id: cpu.id,
           name: cpu.name,
           brand: cpu.manufacturer || "",
-          price: cpu.best_price !== undefined && cpu.best_price !== null ? cpu.best_price : (cpu.raw_data?.price || cpu.tdp || 0), 
+          price: cpu.best_price !== undefined && cpu.best_price !== null ? cpu.best_price : (cpu.raw_data?.price || cpu.tdp || 0),
           best_price: cpu.best_price !== undefined && cpu.best_price !== null ? cpu.best_price : undefined,
           image: `/api/images/CPU_IMG/${encodeURIComponent(cpu.name)}.jpg`,
           specs: {
@@ -296,13 +293,12 @@ const PCConfigurator = () => {
           },
         }));
         setCpus(cpus);
-      } catch (err: any) {
-        setErrorCpus(err.message);
+      } catch (err) {
+        // Si quieres mostrar un mensaje de error, puedes agregar un estado local aquí
       } finally {
         setLoadingCpus(false);
       }
     };
-
     fetchCpus();
   }, []);
 
@@ -455,10 +451,7 @@ const PCConfigurator = () => {
                   {loadingCpus && (
                     <div className="pc-configurator-loading-message">Cargando procesadores...</div>
                   )}
-                  {errorCpus && (
-                    <div className="pc-configurator-error-message">{errorCpus}</div>
-                  )}
-                  {!loadingCpus && !errorCpus && paginatedComponents.length === 0 && (
+                  {!loadingCpus && paginatedComponents.length === 0 && (
                     <div className="pc-configurator-no-results-container">
                       <p>No se encontraron procesadores en la base de datos.</p>
                       <button
@@ -472,10 +465,9 @@ const PCConfigurator = () => {
                       </button>
                     </div>
                   )}
-                  {!loadingCpus && !errorCpus && paginatedComponents.map((component) => {
+                  {!loadingCpus && paginatedComponents.map((component) => {
                     const isSelected = currentBuild[selectedCategory]?.id === component.id;
                     const compatibility = checkCompatibility(component, selectedCategory, currentBuild);
-                    // Obtener el mejor precio si existe
                     const bestPrice = component.best_price !== undefined ? component.best_price : component.price;
                     return (
                       <div
@@ -533,7 +525,7 @@ const PCConfigurator = () => {
                     );
                   })}
                   {/* Paginación */}
-                  {!loadingCpus && !errorCpus && totalPages > 1 && (
+                  {!loadingCpus && totalPages > 1 && (
                     <div className="pc-configurator-pagination-container">
                       <button
                         className="pc-configurator-pagination-btn"

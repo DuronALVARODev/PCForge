@@ -187,7 +187,7 @@ export default function HomePage() {
         <Slider {...settings} className="testimonials-carousel">
           <div className="testimonial-card">
             <div className="testimonial-stars">★★★★★</div>
-            <p>"PCForge me ayudó a armar mi primera PC gaming. La verificación de compatibilidad me ahorró muchos dolores de cabeza."</p>
+            <p>&quot;PCForge me ayudó a armar mi primera PC gaming. La verificación de compatibilidad me ahorró muchos dolores de cabeza.&quot;</p>
             <div className="testimonial-author">
               <User className="author-avatar" />
               <div className="author-info">
@@ -198,7 +198,7 @@ export default function HomePage() {
           </div>
           <div className="testimonial-card">
             <div className="testimonial-stars">★★★★★</div>
-            <p>"Como diseñador necesitaba una workstation potente. El equipo de PCForge me recomendó la configuración perfecta para mi presupuesto."</p>
+            <p>&quot;Como diseñador necesitaba una workstation potente. El equipo de PCForge me recomendó la configuración perfecta para mi presupuesto.&quot;</p>
             <div className="testimonial-author">
               <User className="author-avatar" />
               <div className="author-info">
@@ -209,7 +209,7 @@ export default function HomePage() {
           </div>
           <div className="testimonial-card">
             <div className="testimonial-stars">★★★★★</div>
-            <p>"La visualización 3D es increíble. Pude ver exactamente cómo se vería mi PC antes de comprarla. Definitivamente recomendado."</p>
+            <p>&quot;La visualización 3D es increíble. Pude ver exactamente cómo se vería mi PC antes de comprarla. Definitivamente recomendado.&quot;</p>
             <div className="testimonial-author">
               <User className="author-avatar" />
               <div className="author-info">

@@ -43,9 +43,12 @@ const LoginPage = () => {
       await login(data);
       setSuccess('Inicio de sesión exitoso');
       setError('');
-      // El contexto ya maneja la redirección
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al iniciar sesión');
+    } catch (err) {
+      if (typeof err === 'object' && err !== null && 'response' in err) {
+        setError((err as any).response?.data?.message || 'Error al iniciar sesión');
+      } else {
+        setError('Error al iniciar sesión');
+      }
       setSuccess('');
     }
   };

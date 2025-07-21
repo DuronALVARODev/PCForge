@@ -242,6 +242,7 @@ const CpuPage: React.FC = () => {
                       alt={cpu.name}
                       className="cpu-card-image"
                       loading="lazy"
+                      // TODO: Cambiar por <Image /> de next/image para optimización
                     />
                   </div>
                   <div className="cpu-card-header">

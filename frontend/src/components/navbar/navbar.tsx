@@ -57,6 +57,7 @@ const Navbar = () => {
           <div className="navbar-content">
             <div className="navbar-logo">
               <Link href="/" className="logo-link">
+                {/* TODO: Cambiar por <Image /> de next/image para optimización */}
                 <img src="/images/Logo.png" alt="Logo" className="logo-image" />
               </Link>
             </div>
