@@ -30,12 +30,15 @@ const LoginPage = () => {
   // Cambiar el título dinámicamente y redirigir si ya está autenticado
   useEffect(() => {
     document.title = 'Iniciar Sesión';
-    if (user) {
-      // Evita redirección infinita si ya está en la ruta destino
-      const currentPath = window.location.pathname;
-      if ((user.role === 'admin' || user.role === 'superadmin') && currentPath !== '/admin') {
+    if (!user) return; // Si no hay usuario, no redirigir (deja que ProtectedRoute lo maneje)
+    // Evita redirección infinita si ya está en la ruta destino
+    const currentPath = window.location.pathname;
+    if ((user.role === 'admin' || user.role === 'superadmin')) {
+      if (currentPath !== '/admin') {
         router.push('/admin');
-      } else if (user.role !== 'admin' && user.role !== 'superadmin' && currentPath !== '/pc-build') {
+      }
+    } else {
+      if (currentPath !== '/pc-build') {
         router.push('/pc-build');
       }
     }
