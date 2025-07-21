@@ -36,7 +36,7 @@ const AuthContext = createContext<AuthContextType>({
   refreshUser: async () => {}
 });
 
-const API_BASE_URL = 'http://localhost:4000/api/auth';
+const API_BASE_URL = 'https://pcforge-backend.onrender.com/api/auth';
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);

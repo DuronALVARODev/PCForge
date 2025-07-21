@@ -21,7 +21,7 @@ const VerifyEmailPage = () => {
 
     const verify = async () => {
       try {
-        const res = await axios.get(`http://localhost:4000/api/auth/verify-email?token=${token}`);
+        const res = await axios.get(`https://pcforge-backend.onrender.com/api/auth/verify-email?token=${token}`);
         setStatus('success');
         setMessage(res.data.message || 'Verificación exitosa.');
       } catch (err) {
