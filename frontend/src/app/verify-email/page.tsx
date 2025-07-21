@@ -24,9 +24,15 @@ const VerifyEmailPage = () => {
         const res = await axios.get(`http://localhost:4000/api/auth/verify-email?token=${token}`);
         setStatus('success');
         setMessage(res.data.message || 'Verificación exitosa.');
-      } catch (err: any) {
+      } catch (err) {
         setStatus('error');
-        setMessage(err.response?.data?.message || 'Error al verificar el correo.');
+        // Use a more specific type for error handling
+        if (typeof err === 'object' && err !== null && 'response' in err) {
+          const errorObj = err as { response?: { data?: { message?: string } } };
+          setMessage(errorObj.response?.data?.message || 'Error al verificar el correo.');
+        } else {
+          setMessage('Error al verificar el correo.');
+        }
       }
     };
 

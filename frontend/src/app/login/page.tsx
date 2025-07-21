@@ -44,8 +44,10 @@ const LoginPage = () => {
       setSuccess('Inicio de sesión exitoso');
       setError('');
     } catch (err) {
+      // Use a more specific type for error handling
       if (typeof err === 'object' && err !== null && 'response' in err) {
-        setError((err as any).response?.data?.message || 'Error al iniciar sesión');
+        const errorObj = err as { response?: { data?: { message?: string } } };
+        setError(errorObj.response?.data?.message || 'Error al iniciar sesión');
       } else {
         setError('Error al iniciar sesión');
       }

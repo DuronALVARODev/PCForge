@@ -77,7 +77,8 @@ const Profile = () => {
     }
   });
 
-  const handleChangePassword = async (data: any) => {
+  type ChangePasswordData = z.infer<typeof passwordSchema>;
+  const handleChangePassword = async (data: ChangePasswordData) => {
     try {
       // Aquí iría la lógica para cambiar la contraseña
       console.log('Cambiar contraseña:', data);
@@ -85,13 +86,19 @@ const Profile = () => {
       setError('');
       setShowChangePasswordModal(false);
       passwordForm.reset();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al cambiar la contraseña');
+    } catch (err) {
+      if (typeof err === 'object' && err !== null && 'response' in err) {
+        const errorObj = err as { response?: { data?: { message?: string } } };
+        setError(errorObj.response?.data?.message || 'Error al cambiar la contraseña');
+      } else {
+        setError('Error al cambiar la contraseña');
+      }
       setSuccess('');
     }
   };
 
-  const handleDeleteAccount = async (data: any) => {
+  type DeleteAccountData = z.infer<typeof deleteAccountSchema>;
+  const handleDeleteAccount = async (data: DeleteAccountData) => {
     try {
       // Aquí iría la lógica para eliminar la cuenta
       console.log('Eliminar cuenta con contraseña:', data.password);
@@ -99,21 +106,32 @@ const Profile = () => {
       setError('');
       setShowDeleteModal(false);
       deleteForm.reset();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al eliminar la cuenta');
+    } catch (err) {
+      if (typeof err === 'object' && err !== null && 'response' in err) {
+        const errorObj = err as { response?: { data?: { message?: string } } };
+        setError(errorObj.response?.data?.message || 'Error al eliminar la cuenta');
+      } else {
+        setError('Error al eliminar la cuenta');
+      }
       setSuccess('');
     }
   };
 
-  const handleSaveShippingInfo = async (data: any) => {
+  type ShippingData = z.infer<typeof shippingSchema>;
+  const handleSaveShippingInfo = async (data: ShippingData) => {
     try {
       // Aquí iría la lógica para guardar la información de envío
       console.log('Guardar información de envío:', data);
       setSuccess('Información de envío guardada exitosamente');
       setError('');
       setIsEditing(false);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al guardar la información');
+    } catch (err) {
+      if (typeof err === 'object' && err !== null && 'response' in err) {
+        const errorObj = err as { response?: { data?: { message?: string } } };
+        setError(errorObj.response?.data?.message || 'Error al guardar la información');
+      } else {
+        setError('Error al guardar la información');
+      }
       setSuccess('');
     }
   };
@@ -131,8 +149,8 @@ const Profile = () => {
   };
 
   const getUserCreatedDate = () => {
-    const createdAt = (user as any).createdAt;
-    return createdAt ? formatDate(createdAt) : 'Fecha no disponible';
+    if (!user || typeof user.createdAt !== 'string') return 'Fecha no disponible';
+    return formatDate(user.createdAt);
   };
 
   if (!user) {

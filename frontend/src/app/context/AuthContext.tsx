@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       try {
         const res = await axios.get(`${API_BASE_URL}/me`, { withCredentials: true });
         setUser(res.data);
-      } catch (error) {
+      } catch {
         setUser(null);
       } finally {
         setLoading(false);
@@ -71,8 +71,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       } else {
         router.push("/pc-build");
       }
-    } catch (error) {
-      throw error;
+    } catch {
+      throw new Error('Login failed');
     }
   };
 
@@ -81,7 +81,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       await axios.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true });
       setUser(null);
       router.push('/login');
-    } catch (error) {
+    } catch {
       setUser(null);
       router.push('/login');
     }
@@ -91,7 +91,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       const res = await axios.get(`${API_BASE_URL}/me`, { withCredentials: true });
       setUser(res.data);
-    } catch (error) {
+    } catch {
       setUser(null);
     }
   };

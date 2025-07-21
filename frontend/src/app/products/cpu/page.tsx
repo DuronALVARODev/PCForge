@@ -56,10 +56,10 @@ const fetchCpusFromApi = async (): Promise<CPU[]> => {
     cache_l2: cpu.cache_l2 || undefined,
     cache_l3: cpu.cache_l3 || undefined,
     tdp: cpu.tdp || undefined,
-    best_price: cpu.best_price !== undefined && cpu.best_price !== null ? cpu.best_price : (cpu.raw_data?.price || cpu.tdp || 0),
+    best_price: cpu.best_price !== undefined && cpu.best_price !== null ? cpu.best_price : ((cpu.raw_data && cpu.raw_data.price) || cpu.tdp || 0),
     best_price_store: cpu.best_price_store || "",
     best_price_url: cpu.best_price_url || "",
-    image: `/api/images/CPU_IMG/${encodeURIComponent(cpu.name)}.jpg`,
+    image: `/api/images/CPU_IMG/${typeof cpu.name === 'string' ? encodeURIComponent(cpu.name) : ''}.jpg`,
     // Puedes agregar más campos si lo necesitas
   }));
 };
@@ -81,7 +81,7 @@ const CpuPage: React.FC = () => {
   const [cpus, setCpus] = useState<CPU[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<Record<string, any>>({});
+  const [filters, setFilters] = useState<Record<string, unknown>>({});
   const [search, setSearch] = useState("");
   const [brandFilter, setBrandFilter] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -100,9 +100,9 @@ const CpuPage: React.FC = () => {
 
   // Obtener valores únicos para cada filtro y marcas
   const filterOptions = useMemo(() => {
-    const options: Record<string, any[]> = {};
+    const options: Record<string, unknown[]> = {};
     cpuFilters.forEach((f) => {
-      options[f.key] = Array.from(new Set(cpus.map((cpu) => (cpu as Record<string, any>)[f.key]).filter((v) => v !== undefined && v !== null)));
+      options[f.key] = Array.from(new Set(cpus.map((cpu) => (cpu as any)[f.key]).filter((v) => v !== undefined && v !== null)));
     });
     return options;
   }, [cpus]);
@@ -116,11 +116,11 @@ const CpuPage: React.FC = () => {
   const filteredCpus = useMemo(() => {
     let result = cpus.filter((cpu) => {
       // Filtro de búsqueda
-      if (search && !cpu.name?.toLowerCase().includes(search.toLowerCase())) return false;
+      if (search && typeof cpu.name === 'string' && !cpu.name.toLowerCase().includes(search.toLowerCase())) return false;
       // Filtros select
       for (const key in filters) {
         if (!filters[key]) continue;
-        const value = (cpu as Record<string, any>)[key];
+        const value = (cpu as any)[key];
         if (typeof value === "number") {
           if (value !== Number(filters[key])) return false;
         } else {
@@ -199,14 +199,14 @@ const CpuPage: React.FC = () => {
               {cpuFilters.filter(f => f.key !== "manufacturer").map((filter) => (
                 <div key={filter.key} className="cpu-sidebar-filter-item">
                   <label className="cpu-sidebar-filter-label">{filter.label}</label>
-                  <select
-                    value={filters[filter.key] || ""}
+                    <select
+                    value={typeof filters[filter.key] === 'string' || typeof filters[filter.key] === 'number' ? String(filters[filter.key]) : ""}
                     onChange={(e) => setFilters((prev) => ({ ...prev, [filter.key]: e.target.value }))}
                     className="cpu-sidebar-filter-select"
                   >
                     <option value="">Todos</option>
-                    {filterOptions[filter.key]?.map((option: any) => (
-                      <option key={option} value={option}>{option}</option>
+                    {filterOptions[filter.key]?.map((option) => (
+                      <option key={String(option)} value={String(option)}>{String(option)}</option>
                     ))}
                   </select>
                 </div>

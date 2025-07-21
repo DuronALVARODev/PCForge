@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import ProtectedRoute from '@/components/ProtectedRoute';
+// import { useAuth } from '../context/AuthContext';
+// import ProtectedRoute from '@/components/ProtectedRoute';
 import './products.css';
 
 // Icons
@@ -238,7 +238,7 @@ const ComponentCarousel: React.FC<ComponentCarouselProps> = ({ category, compone
 
 
 const ComponentsPage = () => {
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const [cpus, setCpus] = React.useState<CPU[]>([]);
   const [loadingCpus, setLoadingCpus] = React.useState(false);
   const [errorCpus, setErrorCpus] = React.useState<string | null>(null);
@@ -265,8 +265,12 @@ const ComponentsPage = () => {
           frequency: cpu.clock_base ? `${cpu.clock_base} GHz` : "-",
         }));
         setCpus(cpus);
-      } catch (err: any) {
-        setErrorCpus(err.message);
+      } catch (err) {
+        if (typeof err === 'object' && err !== null && 'message' in err) {
+          setErrorCpus((err as { message?: string }).message || 'Error al obtener CPUs');
+        } else {
+          setErrorCpus('Error al obtener CPUs');
+        }
       } finally {
         setLoadingCpus(false);
       }

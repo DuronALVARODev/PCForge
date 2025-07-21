@@ -51,9 +51,15 @@ const RegisterPage = () => {
             console.log('Respuesta del servidor:', response.data);
             setSuccess('Registro exitoso. Revisa tu correo electrónico para verificar la cuenta.');
             setError('');
-        } catch (err: any) {
+        } catch (err) {
             console.error('Error en el registro:', err);
-            setError(err.response?.data?.message || 'Error en el registro');
+            // Use a more specific type for error handling
+            if (typeof err === 'object' && err !== null && 'response' in err) {
+                const errorObj = err as { response?: { data?: { message?: string } } };
+                setError(errorObj.response?.data?.message || 'Error en el registro');
+            } else {
+                setError('Error en el registro');
+            }
             setSuccess('');
         }
     };

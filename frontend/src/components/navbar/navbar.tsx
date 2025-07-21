@@ -12,7 +12,6 @@ const Navbar = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  const router = useRouter();
 
   const { user, logout, loading } = useAuth();
 
