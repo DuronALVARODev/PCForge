@@ -77,7 +77,11 @@ module.exports = {
 
     // Configuración de CORS (Cross-Origin Resource Sharing)
     cors: {
-        origin: [process.env.FRONTEND_URL || 'http://localhost:3000', 'http://localhost:4000'],
+        origin: [
+            process.env.FRONTEND_URL || 'http://localhost:3000',
+            'http://localhost:4000',
+            'https://pc-forge-smoky.vercel.app'
+        ],
         credentials: true,                  // Permitir cookies
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
