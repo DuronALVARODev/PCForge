@@ -1,0 +1,91 @@
+.my-build-edit {
+  background: #fffde7;
+  color: #f9a825;
+}
+.my-build-edit:hover:not(:disabled) {
+  background: #fff9c4;
+}
+.my-build-actions {
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 0.7rem;
+}
+.my-build-btn {
+  padding: 0.4rem 1.1rem;
+  border-radius: 6px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  background: #eaeaea;
+  color: #222;
+  transition: background 0.15s;
+}
+.my-build-btn:hover:not(:disabled) {
+  background: #d1d1d1;
+}
+.my-build-load {
+  background: #e0f7fa;
+  color: #00796b;
+}
+.my-build-load:hover:not(:disabled) {
+  background: #b2ebf2;
+}
+.my-build-delete {
+  background: #ffebee;
+  color: #c62828;
+}
+.my-build-delete:hover:not(:disabled) {
+  background: #ffcdd2;
+}
+
+.my-builds-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.my-builds-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.my-build-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 1.5rem;
+  transition: box-shadow 0.2s;
+}
+.my-build-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+}
+.my-build-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.my-build-date {
+  font-size: 0.95em;
+  color: #888;
+}
+.my-build-desc {
+  margin-bottom: 0.5rem;
+  color: #444;
+}
+.my-build-components {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.my-build-components li {
+  margin-bottom: 0.2rem;
+}
+.my-builds-loading,
+.my-builds-error,
+.my-builds-empty {
+  text-align: center;
+  margin: 2rem 0;
+  color: #666;
+}

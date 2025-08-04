@@ -5,44 +5,120 @@ import Image from 'next/image';
 // import ProtectedRoute from '@/components/ProtectedRoute';
 import './products.css';
 
-// Icons
-const CpuIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="4" y="4" width="16" height="16" rx="2" />
-    <rect x="9" y="9" width="6" height="6" />
-    <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3" />
-  </svg>
-);
-
-const GpuIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-    <line x1="8" y1="21" x2="16" y2="21" />
-    <line x1="12" y1="17" x2="12" y2="21" />
-  </svg>
-);
-
+// RAM Memory Icon
 const RamIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M6 19v-3" />
-    <path d="M10 19v-3" />
-    <path d="M14 19v-3" />
-    <path d="M18 19v-3" />
-    <path d="M8 11V9" />
-    <path d="M16 11V9" />
-    <path d="M12 11V9" />
-    <path d="M2 15h20" />
-    <path d="M2 7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1.1a2 2 0 0 0 0 3.837V17a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-5.063a2 2 0 0 0 0-3.837Z" />
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+    <rect x="2" y="8" width="20" height="10" rx="1" />
+    <rect x="5" y="11" width="2" height="4" />
+    <rect x="8.5" y="11" width="2" height="4" />
+    <rect x="12" y="11" width="2" height="4" />
+    <rect x="15.5" y="11" width="2" height="4" />
+    <path d="M5 8V6M8.5 8V6M12 8V6M15.5 8V6M19 8V6" />
+    <path d="M2 18h20" />
   </svg>
-);
+)
 
-const StorageIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <ellipse cx="12" cy="5" rx="9" ry="3" />
-    <path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5" />
-    <path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3" />
+// CPU/Processor Icon
+const CpuIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+    <rect x="6" y="6" width="12" height="12" rx="1" />
+    <rect x="9" y="9" width="6" height="6" />
+    <path d="M9 2v4M12 2v4M15 2v4" />
+    <path d="M9 18v4M12 18v4M15 18v4" />
+    <path d="M2 9h4M2 12h4M2 15h4" />
+    <path d="M18 9h4M18 12h4M18 15h4" />
   </svg>
-);
+)
+
+// GPU/Graphics Card Icon
+const GpuIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+    <rect x="2" y="8" width="19" height="10" rx="1" />
+    <rect x="1" y="8" width="1" height="10" />
+    <rect x="1" y="10" width="1" height="1.5" />
+    <rect x="1" y="12.5" width="1" height="1.5" />
+    <rect x="1" y="15" width="1" height="1.5" />
+    <circle cx="7" r="2" cy="12" />
+    <circle cx="12" r="2" cy="12" />
+    <path d="M6 11h2M11 11h2" />
+    <path d="M6 13h2M11 13h2" />
+    <rect x="16" y="10" width="3" height="4" rx="0.5" />
+    <path d="M21 16v2h-3" />
+  </svg>
+)
+
+// Motherboard Icon
+const MotherboardIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+    <rect x="2" y="2" width="20" height="20" rx="1" />
+    <rect x="4" y="4" width="6" height="6" rx="0.5" />
+    <rect x="5" y="12" width="1" height="4" />
+    <rect x="7" y="12" width="1" height="4" />
+    <rect x="9" y="12" width="1" height="4" />
+    <rect x="12" y="4" width="8" height="2" />
+    <rect x="12" y="7" width="8" height="2" />
+    <rect x="12" y="10" width="4" height="2" />
+    <circle cx="14" cy="15" r="1" />
+    <circle cx="17" cy="15" r="1" />
+    <circle cx="19" cy="18" r="1" />
+    <rect x="4" y="18" width="6" height="2" />
+  </svg>
+)
+
+// M.2 SSD Icon
+const M2SsdIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+    <rect x="4" y="10" width="16" height="4" rx="1" transform="rotate(25 12 12)" />
+    <rect x="6" y="11.2" width="2" height="1.6" rx="0.2" transform="rotate(25 12 12)" />
+    <rect x="9" y="11.2" width="2" height="1.6" rx="0.2" transform="rotate(25 12 12)" />
+    <rect x="12" y="11.2" width="2" height="1.6" rx="0.2" transform="rotate(25 12 12)" />
+    <rect x="15" y="11.2" width="2" height="1.6" rx="0.2" transform="rotate(25 12 12)" />
+    <path d="M8 7l2 2M16 15l2 2" transform="rotate(25 12 12)" />
+  </svg>
+)
+
+// Power Supply (PSU) Icon
+const PsuIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+    <rect x="2" y="6" width="20" height="14" rx="1" />
+    <circle cx="18" cy="13" r="4" />
+    <circle cx="18" cy="13" r="1.5" />
+    <circle cx="6" cy="10" r="1" />
+    <circle cx="10" cy="10" r="1" />
+    <rect x="4" y="16" width="8" height="2" rx="0.5" />
+    <path d="M18 9v8M15 10l6 6M21 10l-6 6" />
+  </svg>
+)
+
+// Case/Tower Icon
+const CaseIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+    <rect x="6" y="2" width="12" height="20" rx="1" />
+    <circle cx="12" cy="6" r="1" />
+    <rect x="8" y="9" width="8" height="6" rx="0.5" />
+    <circle cx="10" cy="12" r="1.5" />
+    <circle cx="14" cy="12" r="1.5" />
+    <path d="M9 11h2M13 11h2" />
+    <path d="M9 13h2M13 13h2" />
+    <rect x="8" y="17" width="8" height="2" />
+    <path d="M20 12h2M20 10h1M20 14h1" />
+  </svg>
+)
+
+// Fan/Cooling Icon
+const FanIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+    <rect x="2" y="2" width="20" height="20" rx="1" />
+    <circle cx="12" cy="12" r="8" />
+    <circle cx="12" cy="12" r="2" />
+    <path d="M12 4v4M20 12h-4M12 20v-4M4 12h4" />
+    <path d="M17.66 6.34l-2.83 2.83M17.66 17.66l-2.83-2.83M6.34 17.66l2.83-2.83M6.34 6.34l2.83 2.83" />
+    <circle cx="4" cy="4" r="1" />
+    <circle cx="20" cy="4" r="1" />
+    <circle cx="4" cy="20" r="1" />
+    <circle cx="20" cy="20" r="1" />
+  </svg>
+)
 
 const ChevronLeftIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -70,40 +146,65 @@ const PauseIcon = () => (
 );
 
 // Tipos para los componentes
-type CPU = { id: number; name: string; brand: string; price: number; image: string; rating: number; cores: string; frequency: string };
-type GPU = { id: number; name: string; brand: string; price: number; image: string; rating: number; memory: string; performance: string };
-type RAM = { id: number; name: string; brand: string; price: number; image: string; rating: number; capacity: string; speed: string };
-type Storage = { id: number; name: string; brand: string; price: number; image: string; rating: number; capacity: string; type: string };
 
-type ComponentType = CPU | GPU | RAM | Storage;
-const mockComponents = {
-  tarjetas_graficas: [
-    { id: 1, name: "RTX 4090", brand: "NVIDIA", price: 35000, image: "/api/placeholder/300/200", rating: 4.9, memory: "24GB GDDR6X", performance: "4K Gaming" },
-    { id: 2, name: "RTX 4080", brand: "NVIDIA", price: 25000, image: "/api/placeholder/300/200", rating: 4.8, memory: "16GB GDDR6X", performance: "4K Gaming" },
-    { id: 3, name: "RTX 4070 Ti", brand: "NVIDIA", price: 18000, image: "/api/placeholder/300/200", rating: 4.7, memory: "12GB GDDR6X", performance: "1440p Gaming" },
-    { id: 4, name: "RX 7900 XTX", brand: "AMD", price: 22000, image: "/api/placeholder/300/200", rating: 4.6, memory: "24GB GDDR6", performance: "4K Gaming" },
-    { id: 5, name: "RTX 4060 Ti", brand: "NVIDIA", price: 12000, image: "/api/placeholder/300/200", rating: 4.5, memory: "16GB GDDR6", performance: "1440p Gaming" },
-    { id: 6, name: "RX 7700 XT", brand: "AMD", price: 10500, image: "/api/placeholder/300/200", rating: 4.4, memory: "12GB GDDR6", performance: "1440p Gaming" }
-  ],
-  memoria_ram: [
-    { id: 1, name: "Corsair Vengeance LPX 32GB", brand: "Corsair", price: 3200, image: "/api/placeholder/300/200", rating: 4.8, capacity: "32GB", speed: "3200MHz" },
-    { id: 2, name: "G.Skill Trident Z5 32GB", brand: "G.Skill", price: 3800, image: "/api/placeholder/300/200", rating: 4.9, capacity: "32GB", speed: "6000MHz" },
-    { id: 3, name: "Kingston Fury Beast 16GB", brand: "Kingston", price: 1800, image: "/api/placeholder/300/200", rating: 4.7, capacity: "16GB", speed: "3200MHz" },
-    { id: 4, name: "Corsair Dominator 64GB", brand: "Corsair", price: 8500, image: "/api/placeholder/300/200", rating: 4.9, capacity: "64GB", speed: "5200MHz" },
-    { id: 5, name: "G.Skill Ripjaws V 16GB", brand: "G.Skill", price: 1600, image: "/api/placeholder/300/200", rating: 4.6, capacity: "16GB", speed: "3600MHz" },
-    { id: 6, name: "Crucial Ballistix 32GB", brand: "Crucial", price: 2900, image: "/api/placeholder/300/200", rating: 4.5, capacity: "32GB", speed: "3200MHz" }
-  ],
-  almacenamiento: [
-    { id: 1, name: "Samsung 990 PRO 2TB", brand: "Samsung", price: 4200, image: "/api/placeholder/300/200", rating: 4.9, capacity: "2TB", type: "NVMe SSD" },
-    { id: 2, name: "WD Black SN850X 1TB", brand: "Western Digital", price: 2800, image: "/api/placeholder/300/200", rating: 4.8, capacity: "1TB", type: "NVMe SSD" },
-    { id: 3, name: "Crucial MX4 4TB", brand: "Crucial", price: 8500, image: "/api/placeholder/300/200", rating: 4.7, capacity: "4TB", type: "SATA SSD" },
-    { id: 4, name: "Seagate IronWolf 8TB", brand: "Seagate", price: 5500, image: "/api/placeholder/300/200", rating: 4.6, capacity: "8TB", type: "HDD" },
-    { id: 5, name: "Samsung 980 500GB", brand: "Samsung", price: 1200, image: "/api/placeholder/300/200", rating: 4.5, capacity: "500GB", type: "NVMe SSD" },
-    { id: 6, name: "Kingston NV2 1TB", brand: "Kingston", price: 1800, image: "/api/placeholder/300/200", rating: 4.4, capacity: "1TB", type: "NVMe SSD" }
-  ]
+// Tipos extendidos para incluir best_price_url
+type CPU = {
+  id: string;
+  name: string;
+  brand: string;
+  price: number;
+  image: string;
+  rating: number;
+  cores: string;
+  frequency: string;
+  best_price_url?: string;
 };
 
-type CategoryId = 'procesadores' | 'tarjetas_graficas' | 'memoria_ram' | 'almacenamiento';
+type GPU = {
+  id: string;
+  name: string;
+  brand: string;
+  price: number;
+  image: string;
+  rating: number;
+  memory: string;
+  performance: string;
+  best_price_url?: string;
+};
+
+type RAM = {
+  id: string;
+  name: string;
+  brand: string;
+  price: number;
+  image: string;
+  rating: number;
+  capacity: string;
+  speed: string;
+  best_price_url?: string;
+};
+
+type Storage = {
+  id: string;
+  name: string;
+  brand: string;
+  price: number;
+  image: string;
+  rating: number;
+  capacity: string;
+  type: string;
+  best_price_url?: string;
+};
+
+type Motherboard = { id: string; name: string; brand: string; price: number; image: string; rating: number; socket?: string; formFactor?: string; best_price_url?: string };
+type PSU = { id: string; name: string; brand: string; price: number; image: string; rating: number; wattage?: number; best_price_url?: string };
+type Case = { id: string; name: string; brand: string; price: number; image: string; rating: number; formFactor?: string; best_price_url?: string };
+type Cooler = { id: string; name: string; brand: string; price: number; image: string; rating: number; type?: string; best_price_url?: string };
+
+type ComponentType = CPU | GPU | RAM | Storage | Motherboard | PSU | Case | Cooler;
+
+
+type CategoryId = 'procesadores' | 'tarjetas_graficas' | 'memoria_ram' | 'almacenamiento' | 'placas_base' | 'fuentes_poder' | 'gabinetes' | 'refrigeracion';
 interface Category {
   id: CategoryId;
   name: string;
@@ -114,7 +215,11 @@ const categories: Category[] = [
   { id: "procesadores", name: "Procesadores", icon: CpuIcon },
   { id: "tarjetas_graficas", name: "Tarjetas Gráficas", icon: GpuIcon },
   { id: "memoria_ram", name: "Memoria RAM", icon: RamIcon },
-  { id: "almacenamiento", name: "Almacenamiento", icon: StorageIcon }
+  { id: "almacenamiento", name: "Almacenamiento", icon: M2SsdIcon },
+  { id: "placas_base", name: "Placas Base", icon: MotherboardIcon },
+  { id: "fuentes_poder", name: "Fuentes de Poder", icon: PsuIcon },
+  { id: "gabinetes", name: "Gabinetes", icon: CaseIcon },
+  { id: "refrigeracion", name: "Refrigeración", icon: FanIcon }
 ];
 
 interface ComponentCarouselProps {
@@ -178,7 +283,24 @@ const ComponentCarousel: React.FC<ComponentCarouselProps> = ({ category, compone
           <button className="control-btn" onClick={nextSlide}>
             <ChevronRightIcon />
           </button>
-          <button className="see-all-btn">
+          <button
+            className="see-all-btn"
+            onClick={() => {
+              // Mapeo de categoría a ruta
+              const categoryToRoute: Record<string, string> = {
+                procesadores: "/products/cpu",
+                tarjetas_graficas: "/products/gpu",
+                memoria_ram: "/products/ram",
+                almacenamiento: "/products/storage",
+                placas_base: "/products/motherboard",
+                fuentes_poder: "/products/psu",
+                gabinetes: "/products/case",
+                refrigeracion: "/products/cpu_cooler",
+              };
+              const route = categoryToRoute[category.id] || "/products";
+              window.location.href = route;
+            }}
+          >
             Ver Todo
           </button>
         </div>
@@ -208,6 +330,52 @@ const ComponentCarousel: React.FC<ComponentCarouselProps> = ({ category, compone
                 </div>
                 <div className="component-price">
                   <span className="price-amount">${component.price.toLocaleString()}</span>
+                  {/* Botón de compra con logo del vendedor si existe best_price_url */}
+                  {component.best_price_url && (
+                    <a
+                      href={component.best_price_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="buy-btn"
+                      style={{ display: 'inline-flex', alignItems: 'center', marginTop: 8 }}
+                    >
+                      {/* Detectar dominio y mostrar logo correspondiente */}
+                      {(() => {
+                        const url = component.best_price_url || '';
+                        if (url.includes('amazon.')) {
+                          return (
+                            <img src="/Amazon_logo.svg" alt="Amazon" width={32} height={32} style={{objectFit:'contain'}} />
+                          );
+                        } else if (url.includes('newegg.')) {
+                          return (
+                            <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <ellipse cx="16" cy="16" rx="16" ry="16" fill="#fff"/>
+                              <ellipse cx="20" cy="16" rx="8" ry="6" fill="#F5A623"/>
+                              <ellipse cx="16" cy="16" rx="6" ry="5" fill="#0055A4"/>
+                              <ellipse cx="12" cy="16" rx="4" ry="3" fill="#fff"/>
+                            </svg>
+                          );
+                        } else if (url.includes('bestbuy.')) {
+                          return (
+                            <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <ellipse cx="16" cy="16" rx="16" ry="16" fill="#fff"/>
+                              <rect x="8" y="10" width="16" height="12" rx="2" fill="#FFE000" stroke="#000" strokeWidth="1.5"/>
+                              <text x="16" y="20" textAnchor="middle" fontSize="7" fontWeight="bold" fill="#000">BB</text>
+                            </svg>
+                          );
+                        } else {
+                          // Logo genérico
+                          return (
+                            <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <ellipse cx="16" cy="16" rx="16" ry="16" fill="#eee"/>
+                              <path d="M10 16h12M16 10v12" stroke="#888" strokeWidth="2"/>
+                            </svg>
+                          );
+                        }
+                      })()}
+                      <span style={{ marginLeft: 6, fontWeight: 500, fontSize: 14 }}>Comprar</span>
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
@@ -232,52 +400,198 @@ const ComponentCarousel: React.FC<ComponentCarouselProps> = ({ category, compone
 const ComponentsPage = () => {
   // const { user } = useAuth();
   const [cpus, setCpus] = React.useState<CPU[]>([]);
+  const [gpus, setGpus] = React.useState<GPU[]>([]);
+  const [rams, setRams] = React.useState<RAM[]>([]);
+  const [storages, setStorages] = React.useState<Storage[]>([]);
+  const [motherboards, setMotherboards] = React.useState<Motherboard[]>([]);
+  const [psus, setPsus] = React.useState<PSU[]>([]);
+  const [cases, setCases] = React.useState<Case[]>([]);
+  const [coolers, setCoolers] = React.useState<Cooler[]>([]);
+
   const [loadingCpus, setLoadingCpus] = React.useState(false);
   const [errorCpus, setErrorCpus] = React.useState<string | null>(null);
+  const [loadingGpus, setLoadingGpus] = React.useState(false);
+  const [errorGpus, setErrorGpus] = React.useState<string | null>(null);
+  const [loadingRams, setLoadingRams] = React.useState(false);
+  const [errorRams, setErrorRams] = React.useState<string | null>(null);
+  const [loadingStorages, setLoadingStorages] = React.useState(false);
+  const [errorStorages, setErrorStorages] = React.useState<string | null>(null);
+  const [loadingMotherboards, setLoadingMotherboards] = React.useState(false);
+  const [errorMotherboards, setErrorMotherboards] = React.useState<string | null>(null);
+  const [loadingPsus, setLoadingPsus] = React.useState(false);
+  const [errorPsus, setErrorPsus] = React.useState<string | null>(null);
+  const [loadingCases, setLoadingCases] = React.useState(false);
+  const [errorCases, setErrorCases] = React.useState<string | null>(null);
+  const [loadingCoolers, setLoadingCoolers] = React.useState(false);
+  const [errorCoolers, setErrorCoolers] = React.useState<string | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     document.title = 'Productos - PC Forge';
-    // Fetch CPUs solo una vez
-    const fetchCpus = async () => {
-      setLoadingCpus(true);
-      setErrorCpus(null);
-      try {
-        const res = await fetch("/api/cpus");
-        if (!res.ok) throw new Error("Error al obtener CPUs");
-        const data = await res.json();
-        // Mapear los datos de la API al formato CPU
-        const cpus: CPU[] = data.map((cpu: {
-          id: number;
-          name: string;
-          manufacturer?: string;
-          best_price?: number;
-          raw_data?: { price?: number };
-          tdp?: number;
-          rating?: number;
-          cores_total?: number;
-          clock_base?: number;
-        }) => ({
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    // CPUs
+    setLoadingCpus(true);
+    fetch(`${apiUrl}/api/cpus`)
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then((data) => {
+        const cpus: CPU[] = data.map((cpu: any) => ({
           id: cpu.id,
           name: cpu.name,
           brand: cpu.manufacturer || "",
           price: cpu.best_price !== undefined && cpu.best_price !== null ? cpu.best_price : (cpu.raw_data?.price || cpu.tdp || 0),
-          image: `/api/images/CPU_IMG/${encodeURIComponent(cpu.name)}.jpg`,
+          image: `${apiUrl}/images/CPU_IMG/${encodeURIComponent(cpu.name)}.jpg`,
           rating: cpu.rating || 4.5,
           cores: cpu.cores_total?.toString() || "-",
           frequency: cpu.clock_base ? `${cpu.clock_base} GHz` : "-",
+          best_price_url: cpu.best_price_url || "",
         }));
         setCpus(cpus);
-      } catch (err) {
-        if (typeof err === 'object' && err !== null && 'message' in err) {
-          setErrorCpus((err as { message?: string }).message || 'Error al obtener CPUs');
-        } else {
-          setErrorCpus('Error al obtener CPUs');
-        }
-      } finally {
-        setLoadingCpus(false);
-      }
-    };
-    fetchCpus();
+      })
+      .catch(() => setErrorCpus('Error al obtener CPUs'))
+      .finally(() => setLoadingCpus(false));
+
+    // GPUs
+    setLoadingGpus(true);
+    fetch(`${apiUrl}/api/gpus`)
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then((data) => {
+        const gpus: GPU[] = data.map((gpu: any) => ({
+          id: gpu.id,
+          name: gpu.name,
+          brand: gpu.manufacturer || "",
+          price: gpu.best_price !== undefined && gpu.best_price !== null ? gpu.best_price : (gpu.raw_data?.price || gpu.tdp || 0),
+          image: `${apiUrl}/images/GPU_IMG/${encodeURIComponent(gpu.name)}.jpg`,
+          rating: gpu.rating || 4.5,
+          memory: gpu.memory || "-",
+          performance: gpu.performance || "-",
+          best_price_url: gpu.best_price_url || "",
+        }));
+        setGpus(gpus);
+      })
+      .catch(() => setErrorGpus('Error al obtener GPUs'))
+      .finally(() => setLoadingGpus(false));
+
+    // RAMs
+    setLoadingRams(true);
+    fetch(`${apiUrl}/api/rams`)
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then((data) => {
+        const rams: RAM[] = data.map((ram: any) => ({
+          id: ram.id,
+          name: ram.name,
+          brand: ram.manufacturer || "",
+          price: ram.best_price !== undefined && ram.best_price !== null ? ram.best_price : (ram.raw_data?.price || ram.tdp || 0),
+          image: `${apiUrl}/images/RAM_IMG/${encodeURIComponent(ram.name)}.jpg`,
+          rating: ram.rating || 4.5,
+          capacity: ram.capacity || "-",
+          speed: ram.maxMemorySpeed ? `${ram.maxMemorySpeed} MHz` : "-",
+          best_price_url: ram.best_price_url || "",
+        }));
+        setRams(rams);
+      })
+      .catch(() => setErrorRams('Error al obtener RAMs'))
+      .finally(() => setLoadingRams(false));
+
+    // Storages
+    setLoadingStorages(true);
+    fetch(`${apiUrl}/api/storages`)
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then((data) => {
+        const storages: Storage[] = data.map((storage: any) => ({
+          id: storage.id,
+          name: storage.name,
+          brand: storage.manufacturer || "",
+          price: storage.best_price !== undefined && storage.best_price !== null ? storage.best_price : (storage.raw_data?.price || storage.tdp || 0),
+          image: `${apiUrl}/images/STORAGE_IMG/${encodeURIComponent(storage.name)}.jpg`,
+          rating: storage.rating || 4.5,
+          capacity: storage.capacity || "-",
+          type: storage.type || "-",
+          best_price_url: storage.best_price_url || "",
+        }));
+        setStorages(storages);
+      })
+      .catch(() => setErrorStorages('Error al obtener almacenamiento'))
+      .finally(() => setLoadingStorages(false));
+
+    // Motherboards
+    setLoadingMotherboards(true);
+    fetch(`${apiUrl}/api/motherboards`)
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then((data) => {
+        const motherboards: Motherboard[] = data.map((mb: any) => ({
+          id: mb.id,
+          name: mb.name,
+          brand: mb.manufacturer || "",
+          price: mb.best_price !== undefined && mb.best_price !== null ? mb.best_price : (mb.raw_data?.price || mb.tdp || 0),
+          image: `${apiUrl}/images/MOTHERBOARD_IMG/${encodeURIComponent(mb.name)}.jpg`,
+          rating: mb.rating || 4.5,
+          socket: mb.socket || "-",
+          formFactor: mb.formFactor || "-",
+          best_price_url: mb.best_price_url ? mb.best_price_url : undefined,
+        }));
+        setMotherboards(motherboards);
+      })
+      .catch(() => setErrorMotherboards('Error al obtener placas base'))
+      .finally(() => setLoadingMotherboards(false));
+
+    // PSUs
+    setLoadingPsus(true);
+    fetch(`${apiUrl}/api/psus`)
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then((data) => {
+        const psus: PSU[] = data.map((psu: any) => ({
+          id: psu.id,
+          name: psu.name,
+          brand: psu.manufacturer || "",
+          price: psu.best_price !== undefined && psu.best_price !== null ? psu.best_price : (psu.raw_data?.price || psu.tdp || 0),
+          image: `${apiUrl}/images/PSU_IMG/${encodeURIComponent(psu.name)}.jpg`,
+          rating: psu.rating || 4.5,
+          wattage: psu.wattage || psu.tdp || 0,
+          best_price_url: psu.best_price_url ? psu.best_price_url : undefined,
+        }));
+        setPsus(psus);
+      })
+      .catch(() => setErrorPsus('Error al obtener fuentes de poder'))
+      .finally(() => setLoadingPsus(false));
+
+    // Cases
+    setLoadingCases(true);
+    fetch(`${apiUrl}/api/cases`)
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then((data) => {
+        const cases: Case[] = data.map((c: any) => ({
+          id: c.id,
+          name: c.name,
+          brand: c.manufacturer || "",
+          price: c.best_price !== undefined && c.best_price !== null ? c.best_price : (c.raw_data?.price || c.tdp || 0),
+          image: `${apiUrl}/images/PC_CASE_IMG/${encodeURIComponent(c.name)}.jpg`,
+          rating: c.rating || 4.5,
+          formFactor: c.formFactor || "-",
+          best_price_url: c.best_price_url ? c.best_price_url : undefined,
+        }));
+        setCases(cases);
+      })
+      .catch(() => setErrorCases('Error al obtener gabinetes'))
+      .finally(() => setLoadingCases(false));
+
+    // Coolers
+    setLoadingCoolers(true);
+    fetch(`${apiUrl}/api/coolers`)
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then((data) => {
+        const coolers: Cooler[] = data.map((cooler: any) => ({
+          id: cooler.id,
+          name: cooler.name,
+          brand: cooler.manufacturer || "",
+          price: cooler.best_price !== undefined && cooler.best_price !== null ? cooler.best_price : (cooler.raw_data?.price || cooler.tdp || 0),
+          image: `${apiUrl}/images/CPU_COOLER_IMG/${encodeURIComponent(cooler.name)}.jpg`,
+          rating: cooler.rating || 4.5,
+          type: cooler.type || "-",
+          best_price_url: cooler.best_price_url ? cooler.best_price_url : undefined,
+        }));
+        setCoolers(coolers);
+      })
+      .catch(() => setErrorCoolers('Error al obtener refrigeración'))
+      .finally(() => setLoadingCoolers(false));
   }, []);
 
   return (
@@ -289,29 +603,56 @@ const ComponentsPage = () => {
         </div>
 
         <div className="carousels-container">
-          {categories.map((category) => {
-            if (category.id === "procesadores") {
-              if (loadingCpus) return <div key="procesadores">Cargando procesadores...</div>;
-              if (errorCpus) return <div key="procesadores">Error: {errorCpus}</div>;
-              return (
-                <ComponentCarousel
-                  key={category.id}
-                  category={category}
-                  components={cpus}
-                />
-              );
-            }
-            return (
-              <ComponentCarousel
-                key={category.id}
-                category={category}
-                components={mockComponents[category.id as keyof typeof mockComponents]}
-              />
-            );
-          })}
+          {/* Procesadores */}
+          <ComponentCarousel
+            key="procesadores"
+            category={categories.find(c => c.id === "procesadores")!}
+            components={cpus}
+          />
+          {/* Tarjetas Gráficas */}
+          <ComponentCarousel
+            key="tarjetas_graficas"
+            category={categories.find(c => c.id === "tarjetas_graficas")!}
+            components={gpus}
+          />
+          {/* Memoria RAM */}
+          <ComponentCarousel
+            key="memoria_ram"
+            category={categories.find(c => c.id === "memoria_ram")!}
+            components={rams}
+          />
+          {/* Almacenamiento */}
+          <ComponentCarousel
+            key="almacenamiento"
+            category={categories.find(c => c.id === "almacenamiento")!}
+            components={storages}
+          />
+          {/* Placas Base */}
+          <ComponentCarousel
+            key="placas_base"
+            category={categories.find(c => c.id === "placas_base")!}
+            components={motherboards}
+          />
+          {/* Fuentes de Poder */}
+          <ComponentCarousel
+            key="fuentes_poder"
+            category={categories.find(c => c.id === "fuentes_poder")!}
+            components={psus}
+          />
+          {/* Gabinetes */}
+          <ComponentCarousel
+            key="gabinetes"
+            category={categories.find(c => c.id === "gabinetes")!}
+            components={cases}
+          />
+          {/* Refrigeración */}
+          <ComponentCarousel
+            key="refrigeracion"
+            category={categories.find(c => c.id === "refrigeracion")!}
+            components={coolers}
+          />
         </div>
       </div>
-
   );
 };
 

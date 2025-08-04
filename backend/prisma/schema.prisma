@@ -19,6 +19,7 @@ model user{
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   role String @default("user")
+  builds Build[]
 }
 model CPU {
   id        String @id @default(cuid())
@@ -87,6 +88,7 @@ model CPU {
   @@index([price_updated_at])          // Actualizaciones de precio
   @@index([price_scraping_status])     // Estado del scraping
 
+  builds Build[]
   @@map("cpus")
 }
 
@@ -171,6 +173,7 @@ model CPUCooler {
   @@index([water_cooled, radiator_size]) // Combinado para AIO
   @@index([height, fan_size])          // Combinado para air coolers
 
+  builds Build[]
   @@map("cpu_coolers")
 }
 
@@ -268,6 +271,7 @@ model GPU {
   @@index([cooling])                        // Filtros por tipo de cooling
   @@index([frame_sync])                     // Compatibilidad con monitores
 
+  builds Build[]
   @@map("gpus")
 }
 model Motherboard {
@@ -388,6 +392,7 @@ model Motherboard {
   @@index([memory_type, memory_slots])  // Combinado memoria
   @@index([pcie_x16_slots, pcie_gen])   // Combinado GPU
 
+  builds Build[]
   @@map("motherboards")
 }
 
@@ -509,6 +514,7 @@ model PCCase {
   @@index([form_factor, max_gpu_length]) // Combinado para GPU
   @@index([supports_atx, max_cpu_cooler_height]) // Combinado ATX + cooler
 
+  builds Build[]
   @@map("pc_cases")
 }
 
@@ -625,6 +631,7 @@ model PSU {
   @@index([wattage, efficiency_rating])     // Combinado potencia + eficiencia
   @@index([connector_pcie_8pin, connector_pcie_6plus2]) // GPU combinado
 
+  builds Build[]
   @@map("psus")
 }
 
@@ -730,6 +737,7 @@ model RAM {
   @@index([speed_mhz, cas_latency])         // Combinado velocidad + latencia
   @@index([ecc_support, registered])        // Combinado para servidores/workstations
 
+  builds Build[]
   @@map("ram_modules")
 }
 
@@ -812,5 +820,51 @@ model Storage {
   @@index([price_updated_at])          // Actualizaciones de precio
   @@index([price_scraping_status])     // Estado del scraping
 
+  builds Build[]
   @@map("storage")
+}
+
+
+// === BUILDS DE USUARIO ===
+model Build {
+  id           String   @id @default(cuid())
+  name         String
+  description  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relación con usuario (onDelete: Cascade)
+  userId       String
+  user         user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Referencias a componentes (todas opcionales, patrón compose)
+  cpuId        String?  
+  cpu          CPU?     @relation(fields: [cpuId], references: [id])
+  gpuId        String?
+  gpu          GPU?     @relation(fields: [gpuId], references: [id])
+  ramId        String?
+  ram          RAM?     @relation(fields: [ramId], references: [id])
+  motherboardId String?
+  motherboard  Motherboard? @relation(fields: [motherboardId], references: [id])
+  psuId        String?
+  psu          PSU?     @relation(fields: [psuId], references: [id])
+  caseId       String?
+  case         PCCase?  @relation(fields: [caseId], references: [id])
+  storageId    String?
+  storage      Storage? @relation(fields: [storageId], references: [id])
+  coolerId     String?
+  cooler       CPUCooler? @relation(fields: [coolerId], references: [id])
+
+  // Para extensibilidad futura
+  extra        Json?
+
+  @@index([userId])
+  @@index([cpuId])
+  @@index([gpuId])
+  @@index([ramId])
+  @@index([motherboardId])
+  @@index([psuId])
+  @@index([caseId])
+  @@index([storageId])
+  @@index([coolerId])
 }

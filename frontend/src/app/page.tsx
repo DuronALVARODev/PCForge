@@ -223,6 +223,7 @@ export default function HomePage() {
     </section>
 
       {/* Final CTA Section */}
+    <div className="final-cta-wrapper">
       <section className="final-cta-section">
         <div className="final-cta-content">
           <h2>¿Listo para Empezar?</h2>
@@ -235,6 +236,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+    </div>  
     </main>
   );
 }

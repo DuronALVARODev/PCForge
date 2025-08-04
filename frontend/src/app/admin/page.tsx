@@ -2,22 +2,23 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from '../context/AuthContext';
 
 const AdminPage = () => {
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { logout } = useAuth();
 
   useEffect(() => {
     const checkAdminAccess = async () => {
       try {
-        // Obtener accessToken del contexto
-        const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-        const res = await fetch("https://pcforge-backend.onrender.com/api/auth/me", {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        const res = await fetch(`${apiUrl}/api/auth/me`, {
+          credentials: 'include',
         });
         if (!res.ok) {
-          router.replace("/login");
+          await logout(); // Limpia el usuario global y redirige a /login
           return;
         }
         const data = await res.json();
@@ -27,7 +28,7 @@ const AdminPage = () => {
           router.replace("/profile");
         }
       } catch {
-        router.replace("/profile");
+        await logout();
       } finally {
         setLoading(false);
       }

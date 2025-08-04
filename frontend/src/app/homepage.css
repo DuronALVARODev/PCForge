@@ -2,6 +2,7 @@
 .homepage {
   width: 100%;
   min-height: 100vh;
+  background-color: #000000;
 }
 
 /* Hero Section */
@@ -9,15 +10,23 @@
 background-image: url('../../public/images/HeroIMG.png');
 background-size: cover;
 background-position: center;
-  padding: 80px 20px 60px;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  /* Sombra externa para cuando uses background-image */
-  box-shadow: 
-    0 0 60px rgb(0, 0, 0),
-    inset 0 0 100px rgb(0, 0, 0);
+padding: 80px 20px 60px;
+min-height: 110vh;
+display: flex;
+flex-direction: column;
+justify-content: center;
+/* Sombra externa para cuando uses background-image */
+box-shadow: 0 0 60px rgb(0, 0, 0),inset 0 0 100px rgb(0, 0, 0);
+clip-path: polygon(               0 0,           /* esquina superior izquierda */
+  100% 0,        /* esquina superior derecha */
+  100% 90%,      /* baja por el lado derecho */
+  95% 90%,       /* línea recta horizontal corta hacia adentro */
+  90% 100%,      /* diagonal hacia abajo */
+  10% 100%,      /* línea recta horizontal en la parte inferior */
+  5% 90%,        /* diagonal hacia arriba */
+  0 90%          /* línea recta horizontal, sube por el lado izquierdo */
+);
+background-color: #ffffff;
 
 }
 
@@ -543,6 +552,7 @@ background-image: url('../../public/images/DEVELOPER-PRO.webp');
 
 /* Testimonials Section */
 .testimonials-section {
+  
   padding: 80px 20px;
   background: #f8f9fa;
 }
@@ -617,12 +627,30 @@ background-image: url('../../public/images/DEVELOPER-PRO.webp');
   color: #6c757d;
 }
 
+.final-cta-wrapper {
+  position: relative;
+  background-color: white;
+
+}
 /* Final CTA Section */
 .final-cta-section {
-  padding: 80px 20px;
   background: linear-gradient(135deg, #000000, #202020);
+  padding: 80px 20px;
   color: white;
   text-align: center;
+clip-path: polygon(
+0% 0%,
+90% 0%,
+95% 10%, /* Corte superior: 5% ancho, 10% alto */
+100% 10%,
+100% 100%,
+10% 100%,
+5% 90%, /* Corte inferior: 5% ancho, 10% alto ✅ */
+0% 90%
+);
+
+
+  
 }
 
 .final-cta-content {

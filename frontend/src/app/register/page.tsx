@@ -47,7 +47,8 @@ const RegisterPage = () => {
         console.log('Formulario enviado:', data);
         
         try {
-            const response = await axios.post('https://pcforge-backend.onrender.com/api/auth/register', data);
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+            const response = await axios.post(`${apiUrl}/api/auth/register`, data);
             console.log('Respuesta del servidor:', response.data);
             setSuccess('Registro exitoso. Revisa tu correo electrónico para verificar la cuenta.');
             setError('');

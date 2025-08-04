@@ -1,6 +1,7 @@
+// Eliminar cuenta (requiere autenticación)
 const express = require('express');
 const router = express.Router();
-const { register, login, getMe, logout, verifyToken, refresh } = require('../controllers/auth.controller');
+const { register, login, getMe, logout, verifyToken, refresh, changePassword } = require('../controllers/auth.controller');
 const { verifyEmail, resendVerificationEmail } = require('../controllers/verify.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
 const { loginLimiter, registerLimiter, emailVerificationLimiter } = require('../middlewares/rateLimit.middleware');
@@ -19,6 +20,18 @@ router.post(
   register
 );
 
+// Cambio de contraseña (requiere autenticación)
+router.post(
+  '/change-password',
+  authMiddleware,
+  [
+    body('currentPassword').isLength({ min: 6 }).withMessage('La contraseña actual es requerida'),
+    body('newPassword').isLength({ min: 6 }).withMessage('La nueva contraseña debe tener al menos 6 caracteres'),
+    body('confirmPassword').exists().withMessage('Debes confirmar la nueva contraseña'),
+  ],
+  changePassword
+);
+
 // Verificación de email
 router.get('/verify-email', emailVerificationLimiter, verifyEmail);
 router.post('/resend-verification', emailVerificationLimiter, [body('email').isEmail().withMessage('Email inválido')], resendVerificationEmail);
@@ -32,6 +45,14 @@ router.post(
     body('password').isLength({ min: 8 }).withMessage('Contraseña requerida'),
   ],
   login
+);
+router.post(
+  '/delete-account',
+  authMiddleware,
+  [
+    body('password').isLength({ min: 8 }).withMessage('La contraseña es requerida'),
+  ],
+  require('../controllers/auth.controller').deleteAccount
 );
 
 // Refresh token

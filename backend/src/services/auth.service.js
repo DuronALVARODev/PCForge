@@ -1,3 +1,4 @@
+
 const { PrismaClient } = require("@prisma/client");
 const bycrypt = require("bcryptjs");
 const crypto = require("crypto");
@@ -5,6 +6,24 @@ const { sendVerificationEmail } = require ("../utils/mailer");
 const jwt = require("jsonwebtoken");
 const { isValidEmail, isValidUsername, isStrongPassword, sanitizeInput } = require("../utils/validateInput");
 const prisma = new PrismaClient();
+
+// Cambiar la contraseña de un usuario autenticado
+async function changeUserPassword(userId, currentPassword, newPassword) {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new Error('USER_NOT_FOUND');
+    const valid = await securePasswordCompare(currentPassword, user.passwordHash || user.password);
+    if (!valid) throw new Error('INCORRECT_PASSWORD');
+    const newHash = await bycrypt.hash(newPassword, 12);
+    await prisma.user.update({
+        where: { id: userId },
+        data: { passwordHash: newHash }
+    });
+    // Opcional: invalidar refreshToken para forzar re-login en otros dispositivos
+    await invalidateUserTokens(userId);
+    return true;
+}
+
+
 
 // Función para generar tokens seguros
 function generateSecureToken() {
@@ -110,10 +129,23 @@ async function invalidateUserTokens(userId) {
     });
 }
 
+async function deleteUserAccount(userId, password) {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new Error('USER_NOT_FOUND');
+    const valid = await bycrypt.compare(password, user.passwordHash || user.password);
+    if (!valid) throw new Error('INCORRECT_PASSWORD');
+    // Eliminar builds del usuario (si existen)
+    await prisma.build.deleteMany({ where: { userId } });
+    // Eliminar usuario
+    await prisma.user.delete({ where: { id: userId } });
+    return true;
+}
 module.exports = { 
     registerUser, 
     loginUser, 
     refreshUserToken, 
     invalidateUserTokens,
-    generateSecureToken
+    generateSecureToken,
+    changeUserPassword,
+    deleteUserAccount
 };

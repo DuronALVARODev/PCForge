@@ -1,5 +1,7 @@
 "use client";
+
 import React, { useEffect, useState, useMemo } from "react";
+import Image from 'next/image';
 import "./cpu.css";
 
 // Iconos reutilizables
@@ -34,38 +36,42 @@ interface CPU {
   image?: string;
 }
 
-
-// Fetch CPUs desde la API y mapea al formato CPU
+// Fetch CPUs desde la API y mapea al formato CPU (idéntico a pc-build)
 const fetchCpusFromApi = async (): Promise<CPU[]> => {
-  const res = await fetch("/api/cpus");
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const imgFolder = 'CPU_IMG';
+  const res = await fetch(`${apiUrl}/api/cpus`);
   if (!res.ok) throw new Error("Error al obtener CPUs");
   const data = await res.json();
-return data.map((cpu: Record<string, unknown>) => ({
-    id: cpu.id,
-    name: cpu.name,
-    manufacturer: cpu.manufacturer || "",
-    series: cpu.series || "",
-    part_numbers: cpu.part_numbers || [],
-    variant: cpu.variant || "",
-    release_year: cpu.release_year || undefined,
-    socket: cpu.socket || "",
-    cores_total: cpu.cores_total || undefined,
-    cores_threads: cpu.cores_threads || undefined,
-    clock_base: cpu.clock_base || undefined,
-    clock_boost: cpu.clock_boost || undefined,
-    cache_l2: cpu.cache_l2 || undefined,
-    cache_l3: cpu.cache_l3 || undefined,
-    tdp: cpu.tdp || undefined,
-    best_price: cpu.best_price !== undefined && cpu.best_price !== null
-      ? cpu.best_price
-      : (typeof cpu.raw_data === 'object' && cpu.raw_data !== null && 'price' in cpu.raw_data
-        ? (cpu.raw_data as { price?: number }).price ?? cpu.tdp ?? 0
-        : cpu.tdp ?? 0),
-    best_price_store: cpu.best_price_store || "",
-    best_price_url: cpu.best_price_url || "",
-    image: `/api/images/CPU_IMG/${typeof cpu.name === 'string' ? encodeURIComponent(cpu.name) : ''}.jpg`,
-    // Puedes agregar más campos si lo necesitas
-  }));
+  return data.map((item: Record<string, any>) => {
+    const name = typeof item.name === 'string' ? item.name : '';
+    const brand = typeof item.manufacturer === 'string' ? item.manufacturer : '';
+    const rawData = typeof item.raw_data === 'object' && item.raw_data !== null ? item.raw_data as { price?: number } : undefined;
+    const price = item.best_price !== undefined && item.best_price !== null
+      ? Number(item.best_price)
+      : (rawData?.price ?? 0);
+    return {
+      id: typeof item.id === 'string' ? item.id : '',
+      name,
+      manufacturer: brand,
+      series: item.series || '',
+      part_numbers: item.part_numbers || [],
+      variant: item.variant || '',
+      release_year: item.release_year || undefined,
+      socket: item.socket || '',
+      cores_total: item.cores_total || undefined,
+      cores_threads: item.cores_threads || undefined,
+      clock_base: item.clock_base || undefined,
+      clock_boost: item.clock_boost || undefined,
+      cache_l2: item.cache_l2 || undefined,
+      cache_l3: item.cache_l3 || undefined,
+      tdp: item.tdp || undefined,
+      best_price: item.best_price !== undefined && item.best_price !== null ? Number(item.best_price) : undefined,
+      best_price_store: item.best_price_store || '',
+      best_price_url: item.best_price_url || '',
+      image: `${apiUrl}/images/${imgFolder}/${encodeURIComponent(name)}.jpg`,
+    };
+  });
 };
 
 const cpuFilters = [
@@ -80,8 +86,10 @@ const cpuFilters = [
   { key: "release_year", label: "Año" },
 ];
 
-
 const CpuPage: React.FC = () => {
+  useEffect(() => {
+    document.title = "Procesadores - PC Forge";
+  }, []);
   const [cpus, setCpus] = useState<CPU[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -89,18 +97,20 @@ const CpuPage: React.FC = () => {
   const [search, setSearch] = useState("");
   const [brandFilter, setBrandFilter] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const componentsPerPage = 6;
+  const componentsPerPage = 10; // Cambiado a 10
   const [onlyStock, setOnlyStock] = useState(false);
-  const [sortBy, setSortBy] = useState("existencia");
+  const [sortBy, setSortBy] = useState("menor_precio");
 
   useEffect(() => {
     setLoading(true);
     fetchCpusFromApi()
-      .then((data) => setCpus(data))
+      .then((data) => {
+        setCpus(data);
+        setError(null);
+      })
       .catch(() => setError("Error al cargar CPUs"))
       .finally(() => setLoading(false));
   }, []);
-
 
   // Obtener valores únicos para cada filtro y marcas
   const filterOptions = useMemo(() => {
@@ -114,7 +124,6 @@ const CpuPage: React.FC = () => {
   const brands = useMemo(() => {
     return [...new Set(cpus.map((cpu) => cpu.manufacturer).filter((b): b is string => typeof b === "string" && b.length > 0))];
   }, [cpus]);
-
 
   // Filtrar CPUs
   const filteredCpus = useMemo(() => {
@@ -138,12 +147,10 @@ const CpuPage: React.FC = () => {
       return true;
     });
     // Ordenar
-    if (sortBy === "precio") {
+    if (sortBy === "menor_precio") {
       result = result.sort((a, b) => (a.best_price ?? 0) - (b.best_price ?? 0));
     } else if (sortBy === "mayor_precio") {
       result = result.sort((a, b) => (b.best_price ?? 0) - (a.best_price ?? 0));
-    } else if (sortBy === "existencia") {
-      result = result.sort((a, b) => (b.best_price !== 0 ? 1 : -1) - (a.best_price !== 0 ? 1 : -1));
     }
     return result;
   }, [cpus, filters, search, brandFilter, onlyStock, sortBy]);
@@ -155,15 +162,19 @@ const CpuPage: React.FC = () => {
     return filteredCpus.slice(start, start + componentsPerPage);
   }, [filteredCpus, currentPage]);
 
+  // Scroll suave al top global
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="cpu-page-wrapper">
       <header className="cpu-header">
         <div className="cpu-header-content">
           <CpuIcon />
           <h1>Procesadores</h1>
-          <span className="cpu-header-count">{filteredCpus.length} CPUs</span>
+          <span className="cpu-header-count">{filteredCpus.length} Productos</span>
         </div>
-        <p className="cpu-header-subtitle">Explora todos los procesadores disponibles y filtra por las características que necesitas.</p>
       </header>
 
       <div className="cpu-main-layout">
@@ -172,18 +183,26 @@ const CpuPage: React.FC = () => {
           <div className="cpu-sidebar-section">
             <h2 className="cpu-sidebar-title">Ordena por</h2>
             <select className="cpu-sidebar-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
-              <option value="existencia">Primero con existencia</option>
-              <option value="precio">Menor precio</option>
+              <option value="menor_precio">Menor precio</option>
               <option value="mayor_precio">Mayor precio</option>
             </select>
-            <div className="cpu-sidebar-checkbox-row">
-              <input type="checkbox" id="existence" checked={onlyStock} onChange={e => setOnlyStock(e.target.checked)} />
-              <label htmlFor="existence">Solo productos con existencia</label>
-            </div>
+            
           </div>
           <div className="cpu-sidebar-section">
             <h2 className="cpu-sidebar-title">Filtros</h2>
             <div className="cpu-sidebar-filters">
+              <button
+                className="cpu-sidebar-brand-btn"
+                style={{ marginBottom: '0.5rem', background: '#f3f4f6', color: '#1f2937', fontWeight: 600 }}
+                onClick={() => {
+                  setFilters({});
+                  setBrandFilter([]);
+                  setOnlyStock(false);
+                  setSortBy('menor_precio');
+                }}
+              >
+                Limpiar filtros
+              </button>
               {/* Filtro de marca tipo botón */}
               <div className="cpu-sidebar-filter-item">
                 <label className="cpu-sidebar-filter-label">Marca</label>
@@ -203,7 +222,7 @@ const CpuPage: React.FC = () => {
               {cpuFilters.filter(f => f.key !== "manufacturer").map((filter) => (
                 <div key={filter.key} className="cpu-sidebar-filter-item">
                   <label className="cpu-sidebar-filter-label">{filter.label}</label>
-                    <select
+                  <select
                     value={typeof filters[filter.key] === 'string' || typeof filters[filter.key] === 'number' ? String(filters[filter.key]) : ""}
                     onChange={(e) => setFilters((prev) => ({ ...prev, [filter.key]: e.target.value }))}
                     className="cpu-sidebar-filter-select"
@@ -220,64 +239,95 @@ const CpuPage: React.FC = () => {
         </aside>
 
         {/* Listado de CPUs */}
-        <main className="cpu-list-section cpu-list-fullwidth">
+        <main className="cpu-list-section">
           <div className="cpu-search-bar">
             <input
               type="text"
-              placeholder="Buscar por nombre..."
+              placeholder="Buscar componentes..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="cpu-search-input"
             />
           </div>
           {loading ? (
-            <div className="cpu-loading">Cargando CPUs...</div>
+            <div className="cpu-loading">Cargando procesadores...</div>
           ) : error ? (
             <div className="cpu-error">{error}</div>
           ) : paginatedCpus.length === 0 ? (
-            <div className="cpu-no-results">No se encontraron CPUs con los filtros seleccionados.</div>
+            <div className="cpu-no-results">No se encontraron procesadores con los filtros seleccionados.</div>
           ) : (
-            <div className="cpu-cards-grid cpu-cards-wide">
+            <div className="cpu-cards-grid">
               {paginatedCpus.map((cpu) => (
-                <div key={cpu.id} className="cpu-card cpu-card-large">
-                  <div className="cpu-card-image-row">
-                    <img
+                <div key={cpu.id} className="cpu-card">
+                  <div className="cpu-card-image">
+                    <Image
                       src={cpu.image || "/placeholder.svg"}
                       alt={cpu.name}
-                      className="cpu-card-image"
-                      loading="lazy"
-                      // TODO: Cambiar por <Image /> de next/image para optimización
+                      width={250}
+                      height={200}
+                      className="cpu-image"
+                      style={{ objectFit: 'contain' }}
                     />
                   </div>
-                  <div className="cpu-card-header">
-                    <div className="cpu-card-title-row">
-                      
-                      <h2 className="cpu-card-title">{cpu.name}</h2>
+                  <div className="cpu-card-content">
+                    <h3 className="cpu-card-title">{cpu.name}</h3>
+                    <p className="cpu-card-brand">{cpu.manufacturer}</p>
+                    <div className="cpu-card-specs">
+                      <span>Núcleos: {cpu.cores_total ?? "-"}</span>
+                      <span>Frecuencia: {cpu.clock_base ? `${cpu.clock_base} GHz` : "-"}</span>
                     </div>
-                    <span className="cpu-card-brand">{cpu.manufacturer}</span>
                   </div>
-                  <div className="cpu-card-specs">
-                    <ul>
-                      <li><strong>Socket:</strong> {cpu.socket || "-"}</li>
-                      <li><strong>Núcleos:</strong> {cpu.cores_total ?? "-"}</li>
-                      <li><strong>Threads:</strong> {cpu.cores_threads ?? "-"}</li>
-                      <li><strong>Base:</strong> {cpu.clock_base ? `${cpu.clock_base} GHz` : "-"}</li>
-                      <li><strong>Boost:</strong> {cpu.clock_boost ? `${cpu.clock_boost} GHz` : "-"}</li>
-                      <li><strong>TDP:</strong> {cpu.tdp ? `${cpu.tdp} W` : "-"}</li>
-                      <li><strong>Año:</strong> {cpu.release_year ?? "-"}</li>
-                    </ul>
-                  </div>
-                  
                   <div className="cpu-card-footer">
-                    {cpu.best_price ? (
-                      <a href={cpu.best_price_url || "#"} target="_blank" rel="noopener" className="cpu-card-price">
-                        ${cpu.best_price} 
-                      </a>
+                    {cpu.best_price && cpu.best_price > 0 ? (
+                      <span className="cpu-card-price">${cpu.best_price.toLocaleString()}</span>
                     ) : (
-                      <span className="cpu-card-price">Sin precio</span>
+                      <span className="cpu-card-no-price">Sin precio</span>
                     )}
-                    {cpu.best_price !== 0 && (
-                      <span className="cpu-card-stock-badge">✔ CON EXISTENCIA</span>
+                    {/* Botón de compra con logo del vendedor */}
+                    {cpu.best_price_url && (
+                      <a
+                        href={cpu.best_price_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="buy-btn"
+                        style={{ display: 'inline-flex', alignItems: 'center', marginTop: 8 }}
+                      >
+                        {/* Detectar dominio y mostrar logo correspondiente */}
+                        {(() => {
+                          const url = cpu.best_price_url || '';
+                          if (url.includes('amazon.')) {
+                            return (
+                              <img src="/Amazon_logo.svg" alt="Amazon" width={32} height={32} style={{objectFit:'contain', background:'white', borderRadius:4}} />
+                            );
+                          } else if (url.includes('newegg.')) {
+                            return (
+                              <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <ellipse cx="16" cy="16" rx="16" ry="16" fill="#fff"/>
+                                <ellipse cx="20" cy="16" rx="8" ry="6" fill="#F5A623"/>
+                                <ellipse cx="16" cy="16" rx="6" ry="5" fill="#0055A4"/>
+                                <ellipse cx="12" cy="16" rx="4" ry="3" fill="#fff"/>
+                              </svg>
+                            );
+                          } else if (url.includes('bestbuy.')) {
+                            return (
+                              <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <ellipse cx="16" cy="16" rx="16" ry="16" fill="#fff"/>
+                                <rect x="8" y="10" width="16" height="12" rx="2" fill="#FFE000" stroke="#000" strokeWidth="1.5"/>
+                                <text x="16" y="20" textAnchor="middle" fontSize="7" fontWeight="bold" fill="#000">BB</text>
+                              </svg>
+                            );
+                          } else {
+                            // Logo genérico
+                            return (
+                              <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <ellipse cx="16" cy="16" rx="16" ry="16" fill="#eee"/>
+                                <path d="M10 16h12M16 10v12" stroke="#888" strokeWidth="2"/>
+                              </svg>
+                            );
+                          }
+                        })()}
+                        <span style={{ marginLeft: 6, fontWeight: 500, fontSize: 14 }}>Comprar</span>
+                      </a>
                     )}
                   </div>
                 </div>
@@ -286,23 +336,63 @@ const CpuPage: React.FC = () => {
           )}
           {/* Paginación */}
           {!loading && !error && totalPages > 1 && (
-            <div className="cpu-pagination-container">
+            <div className="cpu-pagination">
               <button
                 className="cpu-pagination-btn"
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                onClick={() => {
+                  if (currentPage !== 1) {
+                    setCurrentPage(1);
+                  }
+                  window.scrollTo({ top: 0 });
+                }}
                 disabled={currentPage === 1}
               >
-                Anterior
+                {'<<'}
+              </button>
+              <button
+                className="cpu-pagination-btn"
+                onClick={() => {
+                  setCurrentPage((p) => {
+                    const newPage = Math.max(1, p - 1);
+                    if (newPage !== p) {
+                      scrollToTop();
+                    }
+                    return newPage;
+                  });
+                }}
+                disabled={currentPage === 1}
+              >
+                {'‹'}
               </button>
               <span className="cpu-pagination-info">
-                Página {currentPage} de {totalPages}
+                {currentPage} de {totalPages}
               </span>
               <button
                 className="cpu-pagination-btn"
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() => {
+                  setCurrentPage((p) => {
+                    const newPage = Math.min(totalPages, p + 1);
+                    if (newPage !== p) {
+                      scrollToTop();
+                    }
+                    return newPage;
+                  });
+                }}
                 disabled={currentPage === totalPages}
               >
-                Siguiente
+                {'›'}
+              </button>
+              <button
+                className="cpu-pagination-btn"
+                onClick={() => {
+                  if (currentPage !== totalPages) {
+                    setCurrentPage(totalPages);
+                  }
+                  window.scrollTo({ top: 0 });
+                }}
+                disabled={currentPage === totalPages}
+              >
+                {'>>'}
               </button>
             </div>
           )}

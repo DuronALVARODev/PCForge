@@ -1,14 +1,86 @@
-const { registerUser } = require ("../services/auth.service");
+const { deleteUserAccount } = require("../services/auth.service");
+/**
+ * Controlador para eliminar la cuenta de usuario
+ */
+const deleteAccount = async (req, res) => {
+    const clientIP = req.ip || req.connection.remoteAddress;
+    const userAgent = req.headers['user-agent'] || 'unknown';
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        logSecurityEvent('DELETE_ACCOUNT_VALIDATION_ERROR', req.user?.id, clientIP, { userAgent, errors: errors.array() });
+        return res.status(400).json({ message: 'Datos inválidos', errors: errors.array(), code: 'DELETE_ACCOUNT_VALIDATION_ERROR' });
+    }
+    try {
+        let { password } = req.body;
+        password = xss(password);
+        await deleteUserAccount(req.user.id, password);
+        logSecurityEvent('DELETE_ACCOUNT_SUCCESS', req.user?.id, clientIP, { userAgent });
+        // Limpiar cookies
+        const isProd = process.env.NODE_ENV === 'production';
+        const cookieOptions = {
+            httpOnly: true,
+            secure: isProd ? true : false,
+            sameSite: isProd ? 'Strict' : 'Lax',
+            path: '/',
+            domain: isProd ? process.env.COOKIE_DOMAIN : undefined
+        };
+        res.clearCookie('accessToken', cookieOptions);
+        res.clearCookie('refreshToken', cookieOptions);
+        res.status(200).json({ message: 'Cuenta eliminada exitosamente', code: 'DELETE_ACCOUNT_SUCCESS' });
+    } catch (err) {
+        logSecurityEvent('DELETE_ACCOUNT_ERROR', req.user?.id, clientIP, { userAgent, error: err.message });
+        if (err.message === 'INCORRECT_PASSWORD') {
+            return res.status(401).json({ message: 'La contraseña es incorrecta', code: 'DELETE_ACCOUNT_INCORRECT_PASSWORD' });
+        }
+        res.status(500).json({ message: 'Error interno del servidor', code: 'DELETE_ACCOUNT_INTERNAL_ERROR' });
+    }
+};
+const { registerUser, changeUserPassword } = require ("../services/auth.service");
 const { isValidEmail, isStrongPassword, isValidUsername, sanitizeInput } = require("../utils/validateInput");
 const { loginUser } = require("../services/auth.service");
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-// Importar express-validator para validación de entrada
 const { validationResult } = require('express-validator');
-// Importar xss para sanitización extra
 const xss = require('xss');
-// Importar función centralizada de logging de seguridad
 const { logSecurityEvent } = require("../utils/securityLog");
+
+/**
+ * Controlador para cambio de contraseña
+ */
+const changePassword = async (req, res) => {
+    const clientIP = req.ip || req.connection.remoteAddress;
+    const userAgent = req.headers['user-agent'] || 'unknown';
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        logSecurityEvent('CHANGE_PASSWORD_VALIDATION_ERROR', req.user?.id, clientIP, { userAgent, errors: errors.array() });
+        return res.status(400).json({ message: 'Datos inválidos', errors: errors.array(), code: 'CHANGE_PASSWORD_VALIDATION_ERROR' });
+    }
+    try {
+        let { currentPassword, newPassword, confirmPassword } = req.body;
+        currentPassword = xss(currentPassword);
+        newPassword = xss(newPassword);
+        confirmPassword = xss(confirmPassword);
+        if (newPassword !== confirmPassword) {
+            logSecurityEvent('CHANGE_PASSWORD_MISMATCH', req.user?.id, clientIP, { userAgent });
+            return res.status(400).json({ message: 'Las contraseñas no coinciden', code: 'CHANGE_PASSWORD_MISMATCH' });
+        }
+        if (!isStrongPassword(newPassword)) {
+            logSecurityEvent('CHANGE_PASSWORD_WEAK', req.user?.id, clientIP, { userAgent });
+            return res.status(400).json({ message: 'La nueva contraseña no es lo suficientemente segura', code: 'CHANGE_PASSWORD_WEAK' });
+        }
+        await changeUserPassword(req.user.id, currentPassword, newPassword);
+        logSecurityEvent('CHANGE_PASSWORD_SUCCESS', req.user?.id, clientIP, { userAgent });
+        res.status(200).json({ message: 'Contraseña cambiada exitosamente', code: 'CHANGE_PASSWORD_SUCCESS' });
+    } catch (err) {
+        logSecurityEvent('CHANGE_PASSWORD_ERROR', req.user?.id, clientIP, { userAgent, error: err.message });
+        if (err.message === 'INCORRECT_PASSWORD') {
+            return res.status(401).json({ message: 'La contraseña actual es incorrecta', code: 'CHANGE_PASSWORD_INCORRECT' });
+        }
+        res.status(500).json({ message: 'Error interno del servidor', code: 'CHANGE_PASSWORD_INTERNAL_ERROR' });
+    }
+};
+
+
 
 /**
  * Controlador de registro de usuario
@@ -91,8 +163,20 @@ const login = async (req, res) => {
         // Obtener información del usuario para el log y respuesta
         const user = await prisma.user.findUnique({ where: { email }, select: { id: true, username: true, email: true, createdAt: true, role: true, isVerified: true } });
         logSecurityEvent('LOGIN_SUCCESS', user?.id, clientIP, { userAgent, email });
-        // Devolver tokens en el body (NO en cookies)
-        res.json({ message: "Inicio de sesión exitoso", code: 'LOGIN_SUCCESS', user, accessToken: tokens.accessToken, refreshToken: tokens.refreshToken });
+        // Opciones de cookie seguras (forzar secure: false y sameSite: 'lax' en desarrollo)
+        const isProd = process.env.NODE_ENV === 'production';
+        const cookieOptions = {
+            httpOnly: true,
+            secure: isProd ? true : false,
+            sameSite: isProd ? 'Strict' : 'Lax',
+            path: '/',
+            domain: isProd ? process.env.COOKIE_DOMAIN : undefined
+        };
+        // Guardar tokens en cookies
+        res.cookie('accessToken', tokens.accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
+        res.cookie('refreshToken', tokens.refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
+        // Devolver usuario (puedes omitir los tokens en el body si quieres máxima seguridad)
+        res.json({ message: "Inicio de sesión exitoso", code: 'LOGIN_SUCCESS', user });
     } catch (error) {
         logSecurityEvent('LOGIN_FAILED', null, clientIP, { userAgent, email: req.body.email, error: error.message });
         console.error("Error en login:", error);
@@ -133,13 +217,14 @@ const logout = async (req, res) => {
             await prisma.user.update({ where: { id: req.user.id }, data: { refreshToken: null } });
             logSecurityEvent('LOGOUT_SUCCESS', req.user.id, clientIP, { userAgent });
         }
-        // Configurar opciones de cookie para limpiar
+        // Configurar opciones de cookie para limpiar (igual que en login)
+        const isProd = process.env.NODE_ENV === 'production';
         const cookieOptions = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'Lax',
+            secure: isProd ? true : false,
+            sameSite: isProd ? 'Strict' : 'Lax',
             path: '/',
-            domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : undefined
+            domain: isProd ? process.env.COOKIE_DOMAIN : undefined
         };
         // Limpiar las cookies
         res.clearCookie('accessToken', cookieOptions);
@@ -206,4 +291,4 @@ const refresh = async (req, res) => {
         res.status(401).json({ message: 'Token de renovación inválido', code: 'REFRESH_INVALID_TOKEN' });
     }
 }
-module.exports = { register, login, getMe, logout, verifyToken, refresh };
+module.exports = { register, login, getMe, logout, verifyToken, refresh, changePassword, deleteAccount };

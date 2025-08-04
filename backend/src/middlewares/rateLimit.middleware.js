@@ -39,10 +39,19 @@ const emailVerificationLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+// Rate limiter laxo para catálogos públicos (catálogo de componentes)
+const catalogLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 1000, // Permite muchas más requests (ajusta según necesidad)
+  message: { message: 'Demasiadas solicitudes de catálogo. Intenta de nuevo más tarde.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 module.exports = {
   loginLimiter,
   registerLimiter,
   apiLimiter,
   emailVerificationLimiter,
+  catalogLimiter,
 };

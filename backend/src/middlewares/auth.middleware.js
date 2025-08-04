@@ -7,15 +7,17 @@ const prisma = new PrismaClient();
  * Middleware de autenticación JWT
  */
 const authMiddleware = async (req, res, next) => {
-  // Eliminado: const authHeader = req.headers.authorization;
-  // Obtener token del header Authorization: Bearer <token>
+  // Buscar token en cookie accessToken, luego en header Authorization, luego en refreshToken
   let token = null;
-  const authHeader = req.headers['authorization'];
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    token = authHeader.slice(7);
-  }
-  if (!token && req.cookies?.refreshToken) {
-    token = req.cookies.refreshToken;
+  if (req.cookies && req.cookies.accessToken) {
+    token = req.cookies.accessToken;
+  } else {
+    const authHeader = req.headers['authorization'];
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.slice(7);
+    } else if (req.cookies && req.cookies.refreshToken) {
+      token = req.cookies.refreshToken;
+    }
   }
   if (!token) {
     // Si no hay token, intentar refrescar usando refreshToken

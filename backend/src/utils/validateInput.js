@@ -1,3 +1,18 @@
+/**
+ * Valida la estructura mínima de un build
+ * @param {object} build
+ * @returns {{valid: boolean, error?: string}}
+ */
+const validateBuildInput = (build) => {
+  if (!build || typeof build !== 'object') {
+    return { valid: false, error: 'Build inválido' };
+  }
+  if (!build.name || typeof build.name !== 'string' || build.name.length < 3) {
+    return { valid: false, error: 'El nombre del build es obligatorio y debe tener al menos 3 caracteres' };
+  }
+  // Puedes agregar más validaciones según tus reglas de negocio
+  return { valid: true };
+};
 const validator = require('validator');
 const xss = require('xss');
 
@@ -82,4 +97,5 @@ module.exports = {
   sanitizeAndValidateString,
   validateRateLimit,
   isSecureToken,
+  validateBuildInput,
 };

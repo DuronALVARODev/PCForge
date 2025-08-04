@@ -39,103 +39,66 @@ const AuthContext = createContext<AuthContextType>({
   refreshUser: async () => {}
 });
 
-const API_BASE_URL = 'https://pcforge-backend.onrender.com/api/auth';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(
-    typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null
-  );
+  const [accessToken] = useState<string | null>(null); // No se usa más accessToken local
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
 
   // Validación inicial al montar la app
   // Sincroniza accessToken con localStorage
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (accessToken) {
-      localStorage.setItem('accessToken', accessToken);
-      console.log('[Auth] Guardando accessToken en localStorage:', accessToken);
-    } else {
-      localStorage.removeItem('accessToken');
-      console.log('[Auth] Eliminando accessToken de localStorage');
-    }
-  }, [accessToken]);
+  // Eliminado: sincronización con localStorage
 
   // Validación inicial al montar la app
   useEffect(() => {
     const validateSession = async () => {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-      console.log('[Auth] Validando sesión. Token en localStorage:', token);
-      if (!token) {
-        setUser(null);
-        setLoading(false);
-        console.log('[Auth] No hay token, usuario fuera de sesión');
-        return;
-      }
-      setAccessToken(token);
       try {
-        const res = await axios.get(`${API_BASE_URL}/me`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await axios.get(`${API_BASE_URL}/api/auth/me`, { withCredentials: true });
         setUser(res.data);
         console.log('[Auth] Usuario autenticado:', res.data);
       } catch (err) {
         setUser(null);
-        setAccessToken(null);
-        localStorage.removeItem('accessToken');
-        console.log('[Auth] Token inválido o expirado. Error:', err);
+        console.log('[Auth] Usuario fuera de sesión o token inválido. Error:', err);
       } finally {
         setLoading(false);
       }
     };
     validateSession();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const login = async (credentials: LoginCredentials) => {
     try {
-      const loginRes = await axios.post(`${API_BASE_URL}/login`, credentials);
+      const loginRes = await axios.post(`${API_BASE_URL}/api/auth/login`, credentials, { withCredentials: true });
       console.log('[Auth] Respuesta de login:', loginRes.data);
-      if (loginRes.data && loginRes.data.accessToken && loginRes.data.user) {
-        setAccessToken(loginRes.data.accessToken);
-        localStorage.setItem('accessToken', loginRes.data.accessToken);
+      if (loginRes.data && loginRes.data.user) {
         setUser(loginRes.data.user);
         console.log('[Auth] Login exitoso. Usuario:', loginRes.data.user);
       } else {
         setUser(null);
-        setAccessToken(null);
-        localStorage.removeItem('accessToken');
         console.log('[Auth] Login fallido. Respuesta inesperada:', loginRes.data);
         throw new Error('Login failed');
       }
     } catch (err) {
       setUser(null);
-      setAccessToken(null);
-      localStorage.removeItem('accessToken');
       console.log('[Auth] Error en login:', err);
       throw new Error('Login failed');
     }
   };
 
   const logout = async () => {
+    try {
+      await axios.post(`${API_BASE_URL}/api/auth/logout`, {}, { withCredentials: true });
+    } catch {}
     setUser(null);
-    setAccessToken(null);
-    localStorage.removeItem('accessToken');
     console.log('[Auth] Logout ejecutado');
     router.push('/login');
   };
 
   const refreshUser = async () => {
-    if (!accessToken) {
-      setUser(null);
-      console.log('[Auth] refreshUser: No accessToken');
-      return;
-    }
     try {
-      const res = await axios.get(`${API_BASE_URL}/me`, {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      });
+      const res = await axios.get(`${API_BASE_URL}/api/auth/me`, { withCredentials: true });
       setUser(res.data);
       console.log('[Auth] refreshUser: Usuario actualizado', res.data);
     } catch (err) {
@@ -145,7 +108,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, accessToken, login, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, loading, accessToken: null, login, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -60,49 +60,11 @@ const Footer = () => {
               <Link href="../../pc-build" className="footer-link">
                 Constructor de PC
               </Link>
-              <Link href="/builds" className="footer-link">
-                Mis Configuraciones
+              <Link href="../../products" className="footer-link">
+                Productos
               </Link>
               <Link href="/about" className="footer-link">
                 Acerca de
-              </Link>
-            </div>
-          </div>
-
-          {/* Support Links */}
-          <div className="footer-section">
-            <h3 className="section-title">Soporte</h3>
-            <div className="section-links">
-              <Link href="/contact" className="footer-link">
-                Contacto
-              </Link>
-              <Link href="/help" className="footer-link">
-                Centro de Ayuda
-              </Link>
-              <Link href="/faq" className="footer-link">
-                Preguntas Frecuentes
-              </Link>
-              <Link href="/compatibility" className="footer-link">
-                Guía de Compatibilidad
-              </Link>
-            </div>
-          </div>
-
-          {/* Legal Pages */}
-          <div className="footer-section">
-            <h3 className="section-title">Legal</h3>
-            <div className="section-links">
-              <Link href="/privacy" className="footer-link">
-                Política de Privacidad
-              </Link>
-              <Link href="/terms" className="footer-link">
-                Términos de Servicio
-              </Link>
-              <Link href="/cookies" className="footer-link">
-                Política de Cookies
-              </Link>
-              <Link href="/licenses" className="footer-link">
-                Licencias
               </Link>
             </div>
           </div>

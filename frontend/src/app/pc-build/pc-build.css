@@ -914,3 +914,91 @@
     padding: 1rem;
   }
 }
+
+.pc-configurator-share-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pc-configurator-share-modal {
+  background: #fff;
+  color: #111;
+  border-radius: 10px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+  padding: 2rem 2.5rem 1.5rem 2.5rem;
+  min-width: 340px;
+  max-width: 90vw;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pc-configurator-share-modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+
+.pc-configurator-share-modal-link-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.pc-configurator-share-modal-link-input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #222;
+  border-radius: 6px;
+  background: #fff;
+  color: #111;
+  outline: none;
+}
+
+.pc-configurator-share-modal-copy-btn {
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 0.7rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s;
+}
+.pc-configurator-share-modal-copy-btn:hover {
+  background: #222;
+}
+
+.pc-configurator-share-modal-copied {
+  margin-left: 0.5rem;
+  color: #28a745;
+  font-size: 0.95em;
+  font-weight: 500;
+}
+
+.pc-configurator-share-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  color: #111;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0.2rem;
+  transition: color 0.2s;
+}
+.pc-configurator-share-modal-close:hover {
+  color: #222;
+}
